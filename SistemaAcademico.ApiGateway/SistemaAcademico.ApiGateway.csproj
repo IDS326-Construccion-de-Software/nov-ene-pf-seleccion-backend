@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaAcademicoBackend.AcademicCatalog.Infrastructure\SistemaAcademicoBackend.AcademicCatalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.AcademicProgress.Infrastructure\SistemaAcademicoBackend.AcademicProgress.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.Authentication.Infrastructure\SistemaAcademicoBackend.Authentication.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.Dashboard.Infrastructure\SistemaAcademicoBackend.Dashboard.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.Payment.Infrastructure\SistemaAcademicoBackend.Payment.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.Professor.Infrastructure\SistemaAcademicoBackend.Professor.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.Reports.Infrastructure\SistemaAcademicoBackend.Reports.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.Retirement.Infrastructure\SistemaAcademicoBackend.Retirement.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.SelecctionAndPreselecction.Infrastructure\SistemaAcademicoBackend.SelecctionAndPreselecction.Infrastructure.csproj" />
+    <ProjectReference Include="..\SistemaAcademicoBackend.SharedKernel.Infraestructure\SistemaAcademicoBackend.SharedKernel.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Middleware\" />
+  </ItemGroup>
+
+</Project>
