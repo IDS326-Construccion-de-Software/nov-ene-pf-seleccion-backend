@@ -963,7 +963,6 @@
       },
       "SistemaAcademico.Retirement.Core/1.0.0": {
         "dependencies": {
-          "SistemaAcademico.Persistence": "1.0.0",
           "SistemaAcademico.SharedKernel.Core": "1.0.0"
         },
         "runtime": {
