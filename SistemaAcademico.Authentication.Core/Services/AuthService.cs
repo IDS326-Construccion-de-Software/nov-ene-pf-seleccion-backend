@@ -14,7 +14,7 @@ namespace SistemaAcademico.Authentication.Core.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly SistemaAcademicoContext _context; 
+        private readonly SistemaAcademicoContext _context;
 
         public AuthService(SistemaAcademicoContext context)
         {
@@ -52,6 +52,29 @@ namespace SistemaAcademico.Authentication.Core.Services
             await _context.SaveChangesAsync();
 
             return nuevoUsuario.IdUsuario;
+        }
+
+
+        // 🔥 AÑADE ESTE MÉTODO
+        public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.CorreoInstitucional == dto.Email);
+
+            if (usuario == null)
+                return null;
+
+            bool passwordOK = BCrypt.Net.BCrypt.Verify(dto.Password, usuario.ClaveHash);
+            if (!passwordOK)
+                return null;
+
+            return new AuthResponseDto
+            {
+                UserId = usuario.IdUsuario,
+                Email = usuario.CorreoInstitucional,
+                AccessToken = "TOKEN_NO_IMPLEMENTADO",
+                RefreshToken = "REFRESH_NO_IMPLEMENTADO"
+            };
         }
     }
 }

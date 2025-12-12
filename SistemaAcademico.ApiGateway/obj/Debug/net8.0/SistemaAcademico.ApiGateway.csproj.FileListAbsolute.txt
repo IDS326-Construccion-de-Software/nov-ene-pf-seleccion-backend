@@ -473,3 +473,14 @@ C:\Users\DELL\Desktop\nov-ene-pf-seleccion-backend\SistemaAcademico.ApiGateway\o
 C:\Users\DELL\Desktop\nov-ene-pf-seleccion-backend\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.genruntimeconfig.cache
 C:\Users\DELL\Desktop\nov-ene-pf-seleccion-backend\SistemaAcademico.ApiGateway\obj\Debug\net8.0\ref\SistemaAcademico.ApiGateway.dll
 C:\Users\DELL\Desktop\nov-ene-pf-seleccion-backend\SistemaAcademico.ApiGateway\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.csproj.AssemblyReference.cache
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.AssemblyInfoInputs.cache
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.AssemblyInfo.cs
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.csproj.CoreCompileInputs.cache
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.sourcelink.json
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.dll
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\refint\SistemaAcademico.ApiGateway.dll
+C:\Users\Yocasta Rivas\Music\Sistema Academico - 0.2\SistemaAcademico.ApiGateway\obj\Debug\net8.0\SistemaAcademico.ApiGateway.pdb
