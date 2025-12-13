@@ -115,12 +115,22 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
         }
 
         /// <summary>
+        /// Renueva el access token usando un refresh token.
+        /// IMPLEMENTACIÓN MÍNIMA (para que compile).
+        /// </summary>
+        public Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto dto)
+        {
+            // Más adelante aquí validaremos el refresh token en BD
+            return Task.FromResult<AuthResponseDto?>(null);
+        }
+
+        /// <summary>
         /// Cierra sesión del usuario invalidando el refresh token.
         /// Implementación mínima para cumplir el contrato.
         /// </summary>
         public Task LogoutAsync(string refreshToken)
         {
-            // Fase 1: no se invalida aún en BD (no rompe al equipo)
+            // Implementación mínima por ahora
             return Task.CompletedTask;
         }
     }

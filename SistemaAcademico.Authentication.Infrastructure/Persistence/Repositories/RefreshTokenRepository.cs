@@ -18,12 +18,18 @@ namespace SistemaAcademico.Authentication.Infrastructure.Persistence.Repositorie
         public async Task<RefreshToken?> GetByTokenAsync(string token)
         {
             return await _context.Set<RefreshToken>()
-                .FirstOrDefaultAsync(rt => rt.Token == token && !rt.Revocado);
+                .FirstOrDefaultAsync(rt => rt.Token == token);
         }
 
-        public async Task RevokeAsync(RefreshToken refreshToken)
+        public async Task AddAsync(RefreshToken refreshToken)
         {
-            refreshToken.Revocado = true;
+            _context.Set<RefreshToken>().Add(refreshToken);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(RefreshToken refreshToken)
+        {
+            _context.Set<RefreshToken>().Update(refreshToken);
             await _context.SaveChangesAsync();
         }
     }

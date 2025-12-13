@@ -27,7 +27,9 @@ namespace SistemaAcademico.Authentication.Core.Services
                 .AnyAsync(u => u.CorreoInstitucional == dto.CorreoInstitucional);
 
             if (existe)
+            {
                 throw new Exception($"El usuario {dto.CorreoInstitucional} ya existe.");
+            }
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -62,25 +64,38 @@ namespace SistemaAcademico.Authentication.Core.Services
                 .FirstOrDefaultAsync(u => u.CorreoInstitucional == dto.Email);
 
             if (usuario == null)
+            {
                 return null;
+            }
 
             bool passwordOK = BCrypt.Net.BCrypt.Verify(dto.Password, usuario.ClaveHash);
+
             if (!passwordOK)
+            {
                 return null;
+            }
 
             return new AuthResponseDto
             {
                 UserId = usuario.IdUsuario,
                 Email = usuario.CorreoInstitucional,
+
                 AccessToken = "TOKEN_NO_IMPLEMENTADO",
-                RefreshToken = "REFRESH_NO_IMPLEMENTADO"
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
+
+                RefreshToken = "REFRESH_NO_IMPLEMENTADO",
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
             };
         }
 
         /// <summary>
-        /// Cierra sesión del usuario.
-        /// Por ahora no invalida tokens porque aún no se manejan Refresh Tokens en BD.
+        /// IMPLEMENTACIÓN TEMPORAL del refresh token.
         /// </summary>
+        Task<AuthResponseDto?> IAuthService.RefreshTokenAsync(RefreshTokenRequestDto dto)
+        {
+            return Task.FromResult<AuthResponseDto?>(null);
+        }
+
         public Task LogoutAsync(string refreshToken)
         {
             // Implementación mínima segura

@@ -21,9 +21,15 @@ namespace SistemaAcademico.Authentication.Infrastructure.Persistence.Repositorie
                 .FirstOrDefaultAsync(rt => rt.Token == token && !rt.Revocado);
         }
 
-        public async Task RevokeAsync(RefreshToken refreshToken)
+        public async Task AddAsync(RefreshToken refreshToken)
         {
-            refreshToken.Revocado = true;
+            _context.Set<RefreshToken>().Add(refreshToken);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(RefreshToken refreshToken)
+        {
+            _context.Set<RefreshToken>().Update(refreshToken);
             await _context.SaveChangesAsync();
         }
     }
