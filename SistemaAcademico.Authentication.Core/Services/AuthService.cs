@@ -76,5 +76,16 @@ namespace SistemaAcademico.Authentication.Core.Services
                 RefreshToken = "REFRESH_NO_IMPLEMENTADO"
             };
         }
+
+        /// <summary>
+        /// Cierra sesión del usuario.
+        /// Por ahora no invalida tokens porque aún no se manejan Refresh Tokens en BD.
+        /// </summary>
+        public Task LogoutAsync(string refreshToken)
+        {
+            // Implementación mínima segura
+            // (No rompe al equipo ni la arquitectura)
+            return Task.CompletedTask;
+        }
     }
 }

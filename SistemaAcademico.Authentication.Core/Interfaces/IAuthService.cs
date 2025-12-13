@@ -12,5 +12,6 @@ namespace SistemaAcademico.Authentication.Core.Interfaces
     {
         Task<int> CrearUsuarioAsync(CreateUserDto dto);
         Task<AuthResponseDto?> LoginAsync(LoginDto dto);
+        Task LogoutAsync(string refreshToken);
     }
 }

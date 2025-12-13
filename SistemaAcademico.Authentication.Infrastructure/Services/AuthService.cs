@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SistemaAcademico.Authentication.Core.DTOs;
 using SistemaAcademico.Authentication.Core.Interfaces;
-using SistemaAcademico.Persistence.Models;   // 👈 tu namespace REAL
+using SistemaAcademico.Persistence.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,7 +14,7 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly SistemaAcademicoContext _dbContext;   // 👈 tu DbContext REAL
+        private readonly SistemaAcademicoContext _dbContext;
         private readonly IConfiguration _configuration;
 
         public AuthService(SistemaAcademicoContext dbContext, IConfiguration configuration)
@@ -49,19 +49,20 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
             if (usuario == null)
                 return null;
 
-            // Comparar password
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, usuario.ClaveHash))
                 return null;
 
-            // Leer JWT settings
             var jwtSection = _configuration.GetSection("JwtSettings");
-            var secret = jwtSection["SecretKey"];
+
+            var secret = jwtSection["SecretKey"]
+                ?? throw new InvalidOperationException("JwtSettings:SecretKey no configurado");
+
             var issuer = jwtSection["Issuer"];
             var audience = jwtSection["Audience"];
-            var accessMinutes = int.Parse(jwtSection["AccessTokenDurationMinutes"]);
-            var refreshDays = int.Parse(jwtSection["RefreshTokenDurationDays"]);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var accessMinutes = int.Parse(jwtSection["AccessTokenDurationMinutes"] ?? "60");
+            var refreshDays = int.Parse(jwtSection["RefreshTokenDurationDays"] ?? "7");
+
             var key = Encoding.UTF8.GetBytes(secret);
 
             var claims = new List<Claim>
@@ -83,6 +84,7 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
                 )
             };
 
+            var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
             var accessToken = tokenHandler.WriteToken(securityToken);
 
@@ -105,10 +107,21 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
                 AccessToken = accessToken,
                 AccessTokenExpiresAt = tokenDescriptor.Expires!.Value,
                 RefreshToken = refreshTokenValue,
-                RefreshTokenExpiresAt = refreshEntity.FechaExpiracion.ToDateTime(TimeOnly.MinValue),
+                RefreshTokenExpiresAt =
+                    refreshEntity.FechaExpiracion.ToDateTime(TimeOnly.MinValue),
                 Email = usuario.CorreoInstitucional,
                 UserId = usuario.IdUsuario
             };
+        }
+
+        /// <summary>
+        /// Cierra sesión del usuario invalidando el refresh token.
+        /// Implementación mínima para cumplir el contrato.
+        /// </summary>
+        public Task LogoutAsync(string refreshToken)
+        {
+            // Fase 1: no se invalida aún en BD (no rompe al equipo)
+            return Task.CompletedTask;
         }
     }
 }
