@@ -31,7 +31,7 @@ namespace SistemaAcademico.Authentication.Core.DTOs
         // (?=.*\d)    = Al menos un número
         // .{8,}       = Mínimo 8 caracteres
         [RegularExpression(@"^(?=.*[A-Z])(?=.*\d).{8,}$",
-            ErrorMessage = "La contraseña temporal debe ser segura (min 8 chars, 1 mayúscula, 1 número).")]
+            ErrorMessage = "La contraseña debe tener mayúscula, número y min 8 caracteres.")]
         public string Password { get; set; } = string.Empty;
         [Required]
         public int IdRol { get; set; }
