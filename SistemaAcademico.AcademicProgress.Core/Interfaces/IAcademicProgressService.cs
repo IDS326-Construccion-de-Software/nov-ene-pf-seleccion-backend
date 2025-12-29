@@ -36,5 +36,12 @@ namespace SistemaAcademico.AcademicProgress.Core.Interfaces
         /// <param name="trimester">El número del trimestre (ej. 1, 2, 3).</param>
         /// <returns>Un DTO con el reporte de calificaciones de medio término.</returns>
         Task<GradeReportDto?> GetMidtermGradesReportAsync(int studentId, int year, int trimester);
+
+        /// <summary>
+        /// Obtiene el historial académico completo de un estudiante, organizado por trimestre.
+        /// </summary>
+        /// <param name="studentId">El ID del estudiante.</param>
+        /// <returns>Un DTO con el historial académico completo.</returns>
+        Task<AcademicHistoryDto?> GetAcademicHistoryAsync(int studentId);
     }
 }

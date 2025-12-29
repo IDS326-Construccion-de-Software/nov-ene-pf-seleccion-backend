@@ -94,5 +94,30 @@ namespace SistemaAcademico.ApiGateway.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Obtiene el historial académico completo de un estudiante.
+        /// </summary>
+        /// <param name="studentId">El ID del estudiante.</param>
+        /// <returns>Un reporte completo con el historial académico del estudiante, organizado por trimestre.</returns>
+        [HttpGet("history")]
+        public async Task<IActionResult> GetAcademicHistory(int studentId)
+        {
+            try
+            {
+                var result = await _academicProgressService.GetAcademicHistoryAsync(studentId);
+
+                if (result == null)
+                {
+                    return NotFound("No se encontró historial académico para el estudiante especificado.");
+                }
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

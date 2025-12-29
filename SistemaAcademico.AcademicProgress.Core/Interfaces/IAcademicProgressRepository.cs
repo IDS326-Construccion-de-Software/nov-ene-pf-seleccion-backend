@@ -24,5 +24,12 @@ namespace SistemaAcademico.AcademicProgress.Core.Interfaces
         /// <param name="states">La lista de estados de la selección a incluir (ej. "Aprobando", "Cursando").</param>
         /// <returns>Una lista de objetos con la información detallada de las calificaciones.</returns>
         Task<IEnumerable<CourseDetailInfo>> GetGradesByPeriodAsync(int studentId, string period, IEnumerable<string> states);
+
+        /// <summary>
+        /// Obtiene toda la información de los cursos completados por un estudiante.
+        /// </summary>
+        /// <param name="studentId">El ID del estudiante.</param>
+        /// <returns>Una lista de objetos con la información del historial.</returns>
+        Task<IEnumerable<StudentCourseHistoryInfo>> GetAllCompletedCoursesForStudentAsync(int studentId);
     }
 }

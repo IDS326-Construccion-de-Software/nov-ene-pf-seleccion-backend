@@ -84,5 +84,42 @@ namespace SistemaAcademico.AcademicProgress.Infrastructure.Persistence.Repositor
 
             return await query.ToListAsync();
         }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<StudentCourseHistoryInfo>> GetAllCompletedCoursesForStudentAsync(int studentId)
+        {
+            var studentProgram = await _dbContext.UsuarioProgramaAcademicos
+                .Include(upa => upa.IdProgramaAcademicoNavigation)
+                    .ThenInclude(p => p.IdCarreraNavigation)
+                .FirstOrDefaultAsync(upa => upa.IdUsuario == studentId && upa.Estatus == "Activo");
+
+            if (studentProgram?.IdProgramaAcademicoNavigation?.IdCarreraNavigation == null)
+            {
+                return Enumerable.Empty<StudentCourseHistoryInfo>();
+            }
+
+            var statesToInclude = new[] { "Aprobando", "Reprobado", "Retirado", "Cursando" };
+
+            var query =
+                from seleccion in _dbContext.Seleccions
+                join seccion in _dbContext.Seccions on seleccion.IdSeccion equals seccion.SeccionId
+                join asignatura in _dbContext.Asignaturas on seccion.IdAsignatura equals asignatura.AsignaturaId
+                join apa in _dbContext.AsignaturaProgramaAcademicos on new { IdAsignatura = asignatura.AsignaturaId, IdProgramaAcademico = studentProgram.IdProgramaAcademico } equals new { apa.IdAsignatura, apa.IdProgramaAcademico }
+                join student in _dbContext.Usuarios on seleccion.IdUsuario equals student.IdUsuario
+                where seleccion.IdUsuario == studentId && statesToInclude.Contains(seleccion.Estado)
+                select new StudentCourseHistoryInfo
+                {
+                    StudentId = student.IdUsuario,
+                    StudentName = student.Nombre + " " + student.Apellido,
+                    ProgramName = $"{studentProgram.IdProgramaAcademicoNavigation.IdCarreraNavigation.Nombre} ({studentProgram.IdProgramaAcademicoNavigation.Periodo})",
+                    Period = seleccion.PeriodoAcademico,
+                    CourseName = asignatura.Nombre,
+                    Credits = apa.Creditos,
+                    FinalGrade = seleccion.Calificacion,
+                    Status = seleccion.Estado
+                };
+
+            return await query.ToListAsync();
+        }
     }
 }
