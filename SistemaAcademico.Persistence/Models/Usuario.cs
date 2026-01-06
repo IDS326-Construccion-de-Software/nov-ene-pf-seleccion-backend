@@ -31,9 +31,11 @@ public partial class Usuario
 
     public virtual Rol IdRolNavigation { get; set; } = null!;
 
-    public virtual ICollection<Seccion> Seccions { get; set; } = new List<Seccion>();
+    public virtual Profesor? Profesor { get; set; }
 
     public virtual ICollection<Seleccion> Seleccions { get; set; } = new List<Seleccion>();
+
+    public virtual ICollection<Preseleccion> Preseleccions { get; set; } = new List<Preseleccion>();
 
     public virtual ICollection<UsuarioAreaAcademica> UsuarioAreaAcademicas { get; set; } = new List<UsuarioAreaAcademica>();
 
@@ -44,4 +46,6 @@ public partial class Usuario
     public virtual ICollection<UsuarioRol> UsuarioRols { get; set; } = new List<UsuarioRol>();
 
     public virtual ICollection<UsuarioTarifario> UsuarioTarifarios { get; set; } = new List<UsuarioTarifario>();
+
+    public virtual ICollection<HistorialAcademico> HistorialAcademicos { get; set; } = new List<HistorialAcademico>();
 }

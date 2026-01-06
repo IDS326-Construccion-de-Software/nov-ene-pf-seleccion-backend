@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SistemaAcademico.Persistence.Data;
 
 namespace SistemaAcademico.Persistence.Models;
 
@@ -9,7 +10,7 @@ public partial class ProgramaAcademico
 
     public string Periodo { get; set; } = null!;
 
-    public string Estatus { get; set; } = null!;
+    public EstatusPrograma Estatus { get; set; }
 
     public int TotalCreditos { get; set; }
 
@@ -20,4 +21,6 @@ public partial class ProgramaAcademico
     public virtual Carrera IdCarreraNavigation { get; set; } = null!;
 
     public virtual ICollection<UsuarioProgramaAcademico> UsuarioProgramaAcademicos { get; set; } = new List<UsuarioProgramaAcademico>();
+
+    public virtual ICollection<AsignaturaProgramaAcademico> AsignaturaProgramaAcademicos { get; set; } = new List<AsignaturaProgramaAcademico>();
 }
