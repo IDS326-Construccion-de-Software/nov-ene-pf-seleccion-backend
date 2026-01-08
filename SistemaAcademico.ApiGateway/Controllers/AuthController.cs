@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SistemaAcademico.Authentication.Core.Controllers
+namespace SistemaAcademico.ApiGateway.Controllers
 {
     [Route("api/auth")]
     [ApiController]
@@ -25,8 +25,8 @@ namespace SistemaAcademico.Authentication.Core.Controllers
         // [AUTH-02] Endpoint de Creación de Usuarios
         
         [HttpPost("create-user")]
-        // TODO: Descomentar la línea siguiente despues de crear el primer user admin
-        //[Authorize(Roles = "Administrador")]
+        // TODO: Descomentar despues de crear el primer user admin
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request)
         {
             try
@@ -37,6 +37,26 @@ namespace SistemaAcademico.Authentication.Core.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _authService.LoginAsync(request);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
     }

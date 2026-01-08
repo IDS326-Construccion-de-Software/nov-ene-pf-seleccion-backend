@@ -14,12 +14,21 @@ namespace SistemaAcademico.Authentication.Core.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IAuthRepository _repository; 
+        private readonly IAuthRepository _repository;
+        private readonly ITokenService _tokenService;
+        private readonly ILoginThrottlingService _throttlingService;
 
-        public AuthService(IAuthRepository repository)
+        public AuthService(
+            IAuthRepository repository,
+            ITokenService tokenService,
+            ILoginThrottlingService throttlingService)
         {
             _repository = repository;
+            _tokenService = tokenService;
+            _throttlingService = throttlingService;
         }
+
+
 
         public async Task<int> CrearUsuarioAsync(CreateUserDto dto)
         {
@@ -47,7 +56,61 @@ namespace SistemaAcademico.Authentication.Core.Services
                 IdRol = dto.IdRol
             };
 
+            nuevoUsuario.UsuarioRols = new List<UsuarioRol>
+            {
+                new UsuarioRol
+                {
+                    IdRol = dto.IdRol,
+                    Estatus = "Activo"
+                }
+            };
+
             return await _repository.CrearUsuarioAsync(nuevoUsuario);
+        }
+
+        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        {
+            if (await _throttlingService.EstaBloqueadoAsync(request.CorreoInstitucional))
+                throw new UnauthorizedAccessException("Cuenta bloqueada temporalmente. Intente más tarde.");
+
+            var usuario = await _repository.ObtenerUsuarioLoginAsync(request.CorreoInstitucional);
+
+            if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.ClaveHash))
+            {
+                await _throttlingService.RegistrarIntentoFallidoAsync(request.CorreoInstitucional);
+                throw new UnauthorizedAccessException("Credenciales inválidas.");
+            }
+
+            var rolActivo = usuario.UsuarioRols.FirstOrDefault(ur => ur.Estatus == "Activo");
+
+            if (rolActivo == null)
+            {
+                throw new UnauthorizedAccessException("El usuario no tiene roles activos para acceder.");
+            }
+
+            await _throttlingService.ResetearIntentosAsync(request.CorreoInstitucional);
+
+            string nombreRol = rolActivo.IdRolNavigation?.Descripcion ?? "RolDesconocido";
+            var accessToken = _tokenService.GenerarAccessToken(usuario, nombreRol);
+            var refreshToken = _tokenService.GenerarRefreshToken();
+
+            var tokenEntity = new UsuarioRefreshToken
+            {
+                Token = refreshToken,
+                IdUsuario = usuario.IdUsuario,
+                FechaCreacion = DateOnly.FromDateTime(DateTime.Now),
+                FechaExpiracion = DateOnly.FromDateTime(DateTime.Now.AddDays(7))
+            };
+            await _repository.GuardarRefreshTokenAsync(tokenEntity);
+
+            return new LoginResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                NombreUsuario = $"{usuario.Nombre} {usuario.Apellido}",
+                Rol = nombreRol,
+                //DebeCambiarPassword = usuario.DebeCambiarContrasenia
+            };
         }
     }
 }

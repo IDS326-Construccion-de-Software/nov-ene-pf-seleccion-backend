@@ -30,5 +30,20 @@ namespace SistemaAcademico.Authentication.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return usuario.IdUsuario;
         }
+
+        public async Task<Usuario?> ObtenerUsuarioLoginAsync(string correo)
+        {
+            return await _context.Usuarios
+                .Include(u => u.UsuarioRols)
+                .ThenInclude(ur => ur.IdRolNavigation)
+                .FirstOrDefaultAsync(u => u.CorreoInstitucional == correo);
+        }
+
+        public async Task GuardarRefreshTokenAsync(UsuarioRefreshToken token)
+        {
+            await _context.Set<UsuarioRefreshToken>().AddAsync(token);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
