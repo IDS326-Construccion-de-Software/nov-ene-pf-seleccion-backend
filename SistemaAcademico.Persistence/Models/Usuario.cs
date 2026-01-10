@@ -25,6 +25,8 @@ public partial class Usuario
 
     public string ClaveHash { get; set; } = null!;
 
+    public bool? CambioClaveSolicitado { get; set; }
+
     public int IdRol { get; set; }
 
     public virtual ICollection<CuentaPorPagar> CuentaPorPagars { get; set; } = new List<CuentaPorPagar>();

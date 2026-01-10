@@ -15,6 +15,8 @@ public partial class AsignaturaProgramaAcademico
 
     public int Creditos { get; set; }
 
+    public int? TrimestreSegunPensum { get; set; }
+
     public virtual Asignatura CorequisitoNavigation { get; set; } = null!;
 
     public virtual Asignatura IdAsignaturaNavigation { get; set; } = null!;

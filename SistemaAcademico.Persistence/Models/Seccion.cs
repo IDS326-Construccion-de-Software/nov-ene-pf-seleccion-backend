@@ -15,6 +15,8 @@ public partial class Seccion
 
     public int IdProfesor { get; set; }
 
+    public string? PeriodoAcademico { get; set; }
+
     public virtual Asignatura IdAsignaturaNavigation { get; set; } = null!;
 
     public virtual Usuario IdProfesorNavigation { get; set; } = null!;

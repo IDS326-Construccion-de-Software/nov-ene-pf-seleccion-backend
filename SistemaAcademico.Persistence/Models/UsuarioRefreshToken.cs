@@ -9,9 +9,9 @@ public partial class UsuarioRefreshToken
 
     public string Token { get; set; } = null!;
 
-    public DateOnly FechaCreacion { get; set; }
+    public DateTime FechaCreacion { get; set; }
 
-    public DateOnly FechaExpiracion { get; set; }
+    public DateTime FechaExpiracion { get; set; }
 
     public int IdUsuario { get; set; }
 
