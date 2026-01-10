@@ -105,6 +105,98 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
             return report;
         }
 
+        /// <inheritdoc />
+        public async Task<AcademicHistoryDto?> GetAcademicHistoryAsync(int studentId)
+        {
+            var allCourses = await _repository.GetAllCompletedCoursesForStudentAsync(studentId);
+
+            if (!allCourses.Any())
+            {
+                return null;
+            }
+
+            var firstCourse = allCourses.First();
+            var historyReport = new AcademicHistoryDto
+            {
+                StudentId = studentId,
+                StudentName = firstCourse.StudentName,
+                ProgramName = firstCourse.ProgramName
+            };
+
+            var groupedByPeriod = allCourses
+                .GroupBy(c => c.Period)
+                .OrderBy(g => g.Key); // Order trimesters chronologically
+
+            decimal cumulativeHonorPoints = 0;
+            int cumulativeCredits = 0;
+
+            foreach (var periodGroup in groupedByPeriod)
+            {
+                decimal trimesterHonorPoints = 0;
+                int trimesterCredits = 0;
+
+                var courseHistoryDtos = new List<CourseHistoryDto>();
+
+                foreach (var course in periodGroup)
+                {
+                    string letterGrade;
+                    if (course.Status == "Retirado")
+                    {
+                        letterGrade = "R";
+                    }
+                    else if (course.Status == "Cursando")
+                    {
+                        letterGrade = "IP"; // "In Progress"
+                    }
+                    else if (course.FinalGrade.HasValue)
+                    {
+                        letterGrade = ConvertToLetterGrade(course.FinalGrade.Value);
+                    }
+                    else
+                    {
+                        letterGrade = "N/A"; // Fallback for unexpected cases
+                    }
+
+                    courseHistoryDtos.Add(new CourseHistoryDto
+                    {
+                        CourseName = course.CourseName,
+                        Credits = course.Credits,
+                        LetterGrade = letterGrade
+                    });
+
+                    // Only include non-withdrawn, graded courses in index calculations
+                    if (course.Status != "Retirado" && course.Status != "Cursando" && course.FinalGrade.HasValue)
+                    {
+                        var honorPoints = ConvertToHonorPoints(course.FinalGrade.Value);
+                        trimesterHonorPoints += honorPoints * course.Credits;
+                        trimesterCredits += course.Credits;
+                    }
+                }
+
+                // Calculate trimester index
+                var trimesterIndex = (trimesterCredits > 0)
+                    ? Math.Round(trimesterHonorPoints / trimesterCredits, 2)
+                    : 0;
+
+                // Update and calculate cumulative index
+                cumulativeHonorPoints += trimesterHonorPoints;
+                cumulativeCredits += trimesterCredits;
+                var cumulativeIndex = (cumulativeCredits > 0)
+                    ? Math.Round(cumulativeHonorPoints / cumulativeCredits, 2)
+                    : 0;
+
+                historyReport.Trimesters.Add(new TrimesterHistoryDto
+                {
+                    Period = periodGroup.Key,
+                    TrimesterIndex = trimesterIndex,
+                    CumulativeIndex = cumulativeIndex,
+                    Courses = courseHistoryDtos
+                });
+            }
+
+            return historyReport;
+        }
+
         private string ConvertToLetterGrade(int nota)
         {
             return nota switch
