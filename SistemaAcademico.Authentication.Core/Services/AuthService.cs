@@ -14,7 +14,7 @@ namespace SistemaAcademico.Authentication.Core.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly SistemaAcademicoContext _context; 
+        private readonly SistemaAcademicoContext _context;
 
         public AuthService(SistemaAcademicoContext context)
         {
@@ -27,7 +27,9 @@ namespace SistemaAcademico.Authentication.Core.Services
                 .AnyAsync(u => u.CorreoInstitucional == dto.CorreoInstitucional);
 
             if (existe)
+            {
                 throw new Exception($"El usuario {dto.CorreoInstitucional} ya existe.");
+            }
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -52,6 +54,53 @@ namespace SistemaAcademico.Authentication.Core.Services
             await _context.SaveChangesAsync();
 
             return nuevoUsuario.IdUsuario;
+        }
+
+
+        // 🔥 AÑADE ESTE MÉTODO
+        public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.CorreoInstitucional == dto.Email);
+
+            if (usuario == null)
+            {
+                return null;
+            }
+
+            bool passwordOK = BCrypt.Net.BCrypt.Verify(dto.Password, usuario.ClaveHash);
+
+            if (!passwordOK)
+            {
+                return null;
+            }
+
+            return new AuthResponseDto
+            {
+                UserId = usuario.IdUsuario,
+                Email = usuario.CorreoInstitucional,
+
+                AccessToken = "TOKEN_NO_IMPLEMENTADO",
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60),
+
+                RefreshToken = "REFRESH_NO_IMPLEMENTADO",
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
+        }
+
+        /// <summary>
+        /// IMPLEMENTACIÓN TEMPORAL del refresh token.
+        /// </summary>
+        Task<AuthResponseDto?> IAuthService.RefreshTokenAsync(RefreshTokenRequestDto dto)
+        {
+            return Task.FromResult<AuthResponseDto?>(null);
+        }
+
+        public Task LogoutAsync(string refreshToken)
+        {
+            // Implementación mínima segura
+            // (No rompe al equipo ni la arquitectura)
+            return Task.CompletedTask;
         }
     }
 }

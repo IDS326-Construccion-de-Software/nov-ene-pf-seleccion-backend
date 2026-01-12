@@ -9,10 +9,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SistemaAcademico.Authentication.Core.Controllers
+namespace SistemaAcademico.ApiGateway.Controllers
 {
-    [Route("api/auth")]
     [ApiController]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -32,12 +32,33 @@ namespace SistemaAcademico.Authentication.Core.Controllers
             try
             {
                 await _authService.CrearUsuarioAsync(request);
-                return Ok(new { message = $"Usuario {request.CorreoInstitucional} creado exitosamente." });
+                return Ok(new
+                {
+                    message = $"Usuario {request.CorreoInstitucional} creado exitosamente."
+                });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        // [AUTH-05] Endpoint Refresh Token
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto dto)
+        {
+            var result = await _authService.RefreshTokenAsync(dto);
+
+            if (result == null)
+            {
+                return StatusCode(401, new
+                {
+                    message = "Refresh token inválido o expirado."
+                });
+            }
+
+            return Ok(result);
         }
     }
 }

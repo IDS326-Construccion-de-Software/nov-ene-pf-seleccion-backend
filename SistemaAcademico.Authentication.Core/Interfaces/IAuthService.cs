@@ -1,4 +1,5 @@
-﻿using SistemaAcademico.Authentication.Core.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using SistemaAcademico.Authentication.Core.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,8 @@ namespace SistemaAcademico.Authentication.Core.Interfaces
     public interface IAuthService
     {
         Task<int> CrearUsuarioAsync(CreateUserDto dto);
+        Task<AuthResponseDto?> LoginAsync(LoginDto dto);
+        Task LogoutAsync(string refreshToken);
+        Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto dto);
     }
 }
