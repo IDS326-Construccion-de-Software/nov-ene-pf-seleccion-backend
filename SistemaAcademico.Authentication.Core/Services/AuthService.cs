@@ -14,17 +14,16 @@ namespace SistemaAcademico.Authentication.Core.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly SistemaAcademicoContext _context; 
+        private readonly IAuthRepository _repository; 
 
-        public AuthService(SistemaAcademicoContext context)
+        public AuthService(IAuthRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         public async Task<int> CrearUsuarioAsync(CreateUserDto dto)
         {
-            bool existe = await _context.Usuarios
-                .AnyAsync(u => u.CorreoInstitucional == dto.CorreoInstitucional);
+            bool existe = await _repository.ExisteCorreoAsync(dto.CorreoInstitucional);
 
             if (existe)
                 throw new Exception($"El usuario {dto.CorreoInstitucional} ya existe.");
@@ -48,10 +47,7 @@ namespace SistemaAcademico.Authentication.Core.Services
                 IdRol = dto.IdRol
             };
 
-            _context.Usuarios.Add(nuevoUsuario);
-            await _context.SaveChangesAsync();
-
-            return nuevoUsuario.IdUsuario;
+            return await _repository.CrearUsuarioAsync(nuevoUsuario);
         }
     }
 }
