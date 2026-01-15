@@ -11,7 +11,7 @@ public partial class UsuarioTarifario
 
     public string Estatus { get; set; } = null!;
 
-    public DateOnly FechaInscripcion { get; set; }
+    public DateTime FechaInscripcion { get; set; }
 
     public virtual Tarifario IdTarifarioNavigation { get; set; } = null!;
 

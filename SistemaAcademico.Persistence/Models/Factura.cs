@@ -7,9 +7,9 @@ public partial class Factura
 {
     public int IdFactura { get; set; }
 
-    public DateOnly Fecha { get; set; }
+    public DateTime Fecha { get; set; }
 
-    public DateOnly FechaVencimiento { get; set; }
+    public DateTime FechaVencimiento { get; set; }
 
     public string NumeroComprobante { get; set; } = null!;
 

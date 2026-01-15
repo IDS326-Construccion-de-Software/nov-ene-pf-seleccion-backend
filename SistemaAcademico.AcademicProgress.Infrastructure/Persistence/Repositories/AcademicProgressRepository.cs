@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SistemaAcademico.AcademicProgress.Core.Entities;
 using SistemaAcademico.AcademicProgress.Core.Interfaces;
-using SistemaAcademico.Persistence.Models; // Using the correct models namespace
+using SistemaAcademico.Persistence.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

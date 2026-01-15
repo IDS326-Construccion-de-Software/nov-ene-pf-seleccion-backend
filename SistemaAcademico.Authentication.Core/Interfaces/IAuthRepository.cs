@@ -11,5 +11,12 @@ namespace SistemaAcademico.Authentication.Core.Interfaces
     {
         Task<bool> ExisteCorreoAsync(string correo);
         Task<int> CrearUsuarioAsync(Usuario usuario);
+        Task<Usuario?> ObtenerUsuarioLoginAsync(string corre);
+        Task GuardarRefreshTokenAsync(UsuarioRefreshToken token);
+        Task EliminarRefreshTokenAsync(UsuarioRefreshToken token);
+        Task<Usuario?> ObtenerUsuarioPorIdAsync(int idUsuario);
+        Task<UsuarioRefreshToken?> ObtenerRefreshTokenAsync(string token);
+
+
     }
 }

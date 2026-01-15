@@ -11,7 +11,7 @@ public partial class UsuarioProgramaAcademico
 
     public string Estatus { get; set; } = null!;
 
-    public DateOnly FechaInscripcion { get; set; }
+    public DateTime FechaInscripcion { get; set; }
 
     public int Permanencia { get; set; }
 

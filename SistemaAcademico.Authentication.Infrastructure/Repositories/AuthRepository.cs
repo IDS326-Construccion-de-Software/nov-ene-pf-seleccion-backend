@@ -30,5 +30,55 @@ namespace SistemaAcademico.Authentication.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return usuario.IdUsuario;
         }
+
+        public async Task<Usuario?> ObtenerUsuarioLoginAsync(string correo)
+        {
+            return await _context.Usuarios
+                .Include(u => u.UsuarioRols)
+                .ThenInclude(ur => ur.IdRolNavigation)
+                .FirstOrDefaultAsync(u => u.CorreoInstitucional == correo);
+        }
+
+        public async Task GuardarRefreshTokenAsync(UsuarioRefreshToken token)
+        {
+            await _context.Set<UsuarioRefreshToken>().AddAsync(token);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<UsuarioRefreshToken?> ObtenerRefreshTokenAsync(string token)
+        {
+            return await _context.Set<UsuarioRefreshToken>()
+                .FirstOrDefaultAsync(t => t.Token == token);
+        }
+
+        public async Task<Usuario?> ObtenerUsuarioPorIdAsync(int idUsuario)
+        {
+            return await _context.Usuarios
+                .Include(u => u.UsuarioRols)
+                .ThenInclude(ur => ur.IdRolNavigation)
+                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+        }
+        //public async Task<UsuarioRefreshToken?> ObtenerRefreshTokenAsync(string token)
+        //{
+        //    var refreshToken = await _context.Set<UsuarioRefreshToken>()
+        //        .FirstOrDefaultAsync(t => t.Token == token);
+
+        //    if (refreshToken == null) return null;
+
+        //    //buscar el usuario
+        //    var usuario = await _context.Usuarios
+        //        .Include(u => u.UsuarioRols)
+        //        .ThenInclude(ur => ur.IdRolNavigation)
+        //        .FirstOrDefaultAsync(u => u.IdUsuario == refreshToken.IdUsuario);
+
+
+
+        //}
+
+        public async Task EliminarRefreshTokenAsync(UsuarioRefreshToken token)
+        {
+            _context.Set<UsuarioRefreshToken>().Remove(token);
+            await _context.SaveChangesAsync();
+        }
     }
 }

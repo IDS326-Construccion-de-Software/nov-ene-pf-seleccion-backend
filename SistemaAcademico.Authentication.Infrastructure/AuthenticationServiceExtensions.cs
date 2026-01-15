@@ -2,11 +2,7 @@
 using SistemaAcademico.Authentication.Core.Interfaces;
 using SistemaAcademico.Authentication.Core.Services;
 using SistemaAcademico.Authentication.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SistemaAcademico.Authentication.Infrastructure.Services;
 
 namespace SistemaAcademico.Authentication.Infrastructure
 {
@@ -14,8 +10,12 @@ namespace SistemaAcademico.Authentication.Infrastructure
     {
         public static IServiceCollection AddAuthenticationModule(this IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<ITokenService, JwtTokenService>();
+            services.AddSingleton<ILoginThrottlingService, MemoryLoginThrottlingService>();
+
             return services;
         }
     }
