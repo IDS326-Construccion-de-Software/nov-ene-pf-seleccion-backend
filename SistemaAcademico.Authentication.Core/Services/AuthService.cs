@@ -168,5 +168,14 @@ namespace SistemaAcademico.Authentication.Core.Services
                 //CambioClaveSolicitado = usuario.CambioClaveSolicitado
             };
         }
+
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var tokenEntity = await _repository.ObtenerRefreshTokenAsync(refreshToken);
+            if (tokenEntity != null)
+            {
+                await _repository.EliminarRefreshTokenAsync(tokenEntity);
+            }
+        }
     }
 }
