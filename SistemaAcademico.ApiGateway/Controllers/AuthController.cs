@@ -59,5 +59,30 @@ namespace SistemaAcademico.ApiGateway.Controllers
                 return StatusCode(500, new { error = "Error interno del servidor." });
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var result = await _authService.RefreshTokenAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request)
+        {
+            await _authService.LogoutAsync(request.RefreshToken);
+
+            return NoContent();
+        }
     }
 }
