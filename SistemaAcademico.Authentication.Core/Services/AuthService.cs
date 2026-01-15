@@ -9,6 +9,7 @@ using SistemaAcademico.Authentication.Core.DTOs;
 using SistemaAcademico.Authentication.Core.Interfaces;
 using SistemaAcademico.Persistence.Models;
 using SistemaAcademico.Persistence;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SistemaAcademico.Authentication.Core.Services
 {
@@ -49,7 +50,7 @@ namespace SistemaAcademico.Authentication.Core.Services
                 CorreoPersonal = dto.CorreoPersonal,
                 CorreoInstitucional = dto.CorreoInstitucional,
 
-                FechaIngreso = DateOnly.FromDateTime(DateTime.Now),
+                FechaIngreso = DateTime.UtcNow,
 
                 ClaveHash = passwordHash,
 
@@ -98,8 +99,8 @@ namespace SistemaAcademico.Authentication.Core.Services
             {
                 Token = refreshToken,
                 IdUsuario = usuario.IdUsuario,
-                FechaCreacion = DateOnly.FromDateTime(DateTime.Now),
-                FechaExpiracion = DateOnly.FromDateTime(DateTime.Now.AddDays(7))
+                FechaCreacion = DateTime.UtcNow,
+                FechaExpiracion = DateTime.Now.AddDays(7)
             };
             await _repository.GuardarRefreshTokenAsync(tokenEntity);
 
@@ -110,6 +111,61 @@ namespace SistemaAcademico.Authentication.Core.Services
                 NombreUsuario = $"{usuario.Nombre} {usuario.Apellido}",
                 Rol = nombreRol,
                 //DebeCambiarPassword = usuario.DebeCambiarContrasenia
+            };
+        }
+
+        public async Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        {
+            //buscar el refresh token
+            var tokenGuardado = await _repository.ObtenerRefreshTokenAsync(request.RefreshToken);
+
+            if(tokenGuardado == null)
+            {
+                throw new SecurityTokenException("Refresh Token invalido");
+            }
+
+            if(tokenGuardado.FechaExpiracion < DateTime.UtcNow)
+            {
+                await _repository.EliminarRefreshTokenAsync(tokenGuardado);
+                throw new SecurityTokenException("Refresh Token expirado");
+            }
+
+            var usuario = await _repository.ObtenerUsuarioPorIdAsync(tokenGuardado.IdUsuario);
+
+            if(usuario == null)
+            {
+                await _repository.EliminarRefreshTokenAsync(tokenGuardado);
+                throw new SecurityTokenException("Usuario no encontrado");
+            }
+
+            // borrar el viejo
+            await _repository.EliminarRefreshTokenAsync(tokenGuardado);
+
+            //generar nuevos
+            var rolActivo = usuario.UsuarioRols.FirstOrDefault(ur => ur.Estatus == "Activo");
+            string nombreRol = rolActivo?.IdRolNavigation?.Descripcion ?? "RolDesconocido";
+
+            var newAccessToken = _tokenService.GenerarAccessToken(usuario, nombreRol);
+            var newRefreshToken = _tokenService.GenerarRefreshToken();
+
+            //guardar el nuevo
+            var newTokenEntity = new UsuarioRefreshToken
+            {
+                Token = newRefreshToken,
+                IdUsuario = usuario.IdUsuario,
+                FechaCreacion = DateTime.UtcNow,
+                FechaExpiracion = DateTime.Now.AddDays(7)
+            };
+
+            await _repository.GuardarRefreshTokenAsync(newTokenEntity);
+
+            return new LoginResponse
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken,
+                NombreUsuario = $"{usuario.Nombre} {usuario.Apellido}",
+                Rol = nombreRol,
+                //CambioClaveSolicitado = usuario.CambioClaveSolicitado
             };
         }
     }

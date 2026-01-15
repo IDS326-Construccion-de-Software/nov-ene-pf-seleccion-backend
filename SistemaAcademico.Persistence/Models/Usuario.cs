@@ -21,7 +21,7 @@ public partial class Usuario
 
     public string CorreoInstitucional { get; set; } = null!;
 
-    public DateOnly FechaIngreso { get; set; }
+    public DateTime FechaIngreso { get; set; }
 
     public string ClaveHash { get; set; } = null!;
 
