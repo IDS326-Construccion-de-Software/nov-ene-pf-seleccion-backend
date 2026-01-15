@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SistemaAcademico.Authentication.Core.DTOs
+{
+    public class ForgotPasswordDto
+    {
+        [Required, EmailAddress]
+        public string CorreoInstitucional { get; set; } = string.Empty;
+    }
+}

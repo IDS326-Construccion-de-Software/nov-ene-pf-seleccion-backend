@@ -80,5 +80,22 @@ namespace SistemaAcademico.Authentication.Infrastructure.Repositories
             _context.Set<UsuarioRefreshToken>().Remove(token);
             await _context.SaveChangesAsync();
         }
+
+        public async Task ActualizarUsuarioAsync(Usuario usuario)
+        {
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RevocarTodosLosTokensUsuarioAsync(int idUsuario)
+        {
+            // Buscamos todos los tokens de ese usuario
+            var tokens = _context.Set<UsuarioRefreshToken>()
+                .Where(t => t.IdUsuario == idUsuario);
+
+            // Los borramos todos
+            _context.Set<UsuarioRefreshToken>().RemoveRange(tokens);
+            await _context.SaveChangesAsync();
+        }
     }
 }

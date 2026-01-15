@@ -13,5 +13,8 @@ namespace SistemaAcademico.Authentication.Core.Interfaces
         Task<LoginResponse> LoginAsync(LoginRequest request);
         Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request);
         Task LogoutAsync(string refreshToken);
+        Task CambiarPasswordAsync(ChangePasswordDto dto);
+        Task SolicitarRecuperacionAsync(ForgotPasswordDto dto);
+        Task ResetearPasswordConOtpAsync(ResetPasswordDto dto);
     }
 }

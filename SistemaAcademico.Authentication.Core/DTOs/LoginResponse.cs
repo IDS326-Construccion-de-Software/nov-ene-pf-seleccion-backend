@@ -12,6 +12,6 @@ namespace SistemaAcademico.Authentication.Core.DTOs
         public string RefreshToken { get; set; } = string.Empty;
         public string NombreUsuario { get; set; } = string.Empty;
         public string Rol { get; set; } = string.Empty;
-        //public bool CambioClaveSolicitados { get; set; }
+        public bool CambioClaveSolicitado { get; set; }
     }
 }

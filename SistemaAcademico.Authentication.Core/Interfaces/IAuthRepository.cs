@@ -16,7 +16,8 @@ namespace SistemaAcademico.Authentication.Core.Interfaces
         Task EliminarRefreshTokenAsync(UsuarioRefreshToken token);
         Task<Usuario?> ObtenerUsuarioPorIdAsync(int idUsuario);
         Task<UsuarioRefreshToken?> ObtenerRefreshTokenAsync(string token);
-
+        Task ActualizarUsuarioAsync(Usuario usuario);
+        Task RevocarTodosLosTokensUsuarioAsync(int idUsuario);
 
     }
 }
