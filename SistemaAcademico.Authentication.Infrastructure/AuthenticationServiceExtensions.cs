@@ -15,6 +15,9 @@ namespace SistemaAcademico.Authentication.Infrastructure
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddSingleton<ILoginThrottlingService, MemoryLoginThrottlingService>();
+            services.AddSingleton<IOtpService, OtpService>();
+            //services.AddScoped<IEmailService, MockEmailService>();
+            services.AddScoped<IEmailService, SmtpEmailService>();
 
             return services;
         }
