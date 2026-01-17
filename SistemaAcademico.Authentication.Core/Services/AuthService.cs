@@ -244,7 +244,7 @@ namespace SistemaAcademico.Authentication.Core.Services
         {
             return $@"
                 <div style='font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;'>
-                    <div style='background-color: #0d6efd; color: white; padding: 20px; text-align: center;'>
+                    <div style='background-color: #E4022B; color: white; padding: 20px; text-align: center;'>
                         <h2 style='margin: 0;'>Universidad - Sistema Académico</h2>
                     </div>
                     <div style='padding: 20px; color: #333;'>
