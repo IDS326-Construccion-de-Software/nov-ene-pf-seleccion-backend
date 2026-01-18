@@ -49,19 +49,35 @@ namespace SistemaAcademico.Tests.Integration
                     // AGREGAR ESTO:
                     if (!db.Usuarios.Any())
                     {
-                        db.Usuarios.Add(new Usuario
+                        // 1. Crear el Usuario
+                        var testUser = new Usuario
                         {
+                            IdUsuario = 1, // Asignamos ID fijo para la relación
                             CorreoInstitucional = "admin@test.com",
-                            // Nota: Si usas BCrypt, pon aquí el hash de "Admin123!"
                             ClaveHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
                             CambioClaveSolicitado = false,
                             Nombre = "Admin",
-                            Apellido = "Pruebas",
-                            CorreoPersonal = "admin.personal@test.com",
-                            Direccion = "Calle de Pruebas 123",
-                            Nacionalidad = "Dominicano", // O la que prefieras
-                            Telefono = "8090000000"
+                            Apellido = "Test",
+                            CorreoPersonal = "admin@test.com",
+                            Direccion = "N/A",
+                            Nacionalidad = "N/A",
+                            Telefono = "0000000000"
+                        };
+                        db.Usuarios.Add(testUser);
+
+                        // 2. Crear el Rol (Administrador)
+                        // Nota: Si ya tienes roles en tu tabla, asegúrate que el ID o Nombre coincida
+                        var adminRole = new Rol { RolId = 1, Descripcion = "Administrador" };
+                        db.Rols.Add(adminRole);
+
+                        // 3. Crear la relación UsuarioRol ACTIVA
+                        db.UsuarioRols.Add(new UsuarioRol
+                        {
+                            IdUsuario = 1,
+                            IdRol = 1,
+                            Estatus = "Activo"
                         });
+
                         db.SaveChanges();
                     }
                 }
