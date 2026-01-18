@@ -43,7 +43,7 @@ namespace SistemaAcademico.Authentication.Core.Services
             bool existe = await _repository.ExisteCorreoAsync(dto.CorreoInstitucional);
 
             if (existe)
-                throw new Exception($"El usuario {dto.CorreoInstitucional} ya existe.");
+                throw new UserAlreadyExistsException($"El usuario {dto.CorreoInstitucional} ya existe.");
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -191,10 +191,12 @@ namespace SistemaAcademico.Authentication.Core.Services
         public async Task CambiarPasswordAsync(ChangePasswordDto dto)
         {
             var usuario = await _repository.ObtenerUsuarioLoginAsync(dto.CorreoInstitucional);
-            if (usuario == null) throw new UnauthorizedAccessException("Usuario no encontrado.");
+            if (usuario == null)
+                throw new UnauthorizedAccessException("Credenciales inválidas.");
+
 
             if (!BCrypt.Net.BCrypt.Verify(dto.PasswordActual, usuario.ClaveHash))
-                throw new UnauthorizedAccessException("La contraseña actual es incorrecta.");
+                throw new UnauthorizedAccessException("Credenciales inválidas.");
 
             if (BCrypt.Net.BCrypt.Verify(dto.NuevaPassword, usuario.ClaveHash))
                 throw new ArgumentException("La nueva contraseña no puede ser igual a la anterior.");
@@ -227,7 +229,9 @@ namespace SistemaAcademico.Authentication.Core.Services
                 throw new UnauthorizedAccessException("Código OTP inválido.");
 
             var usuario = await _repository.ObtenerUsuarioLoginAsync(dto.CorreoInstitucional);
-            if (usuario == null) throw new Exception("Usuario no encontrado.");
+            if (usuario == null)
+                throw new UnauthorizedAccessException("Credenciales inválidas.");
+
 
             usuario.ClaveHash = BCrypt.Net.BCrypt.HashPassword(dto.NuevaPassword);
 

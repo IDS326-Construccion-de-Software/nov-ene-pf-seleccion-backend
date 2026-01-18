@@ -15,11 +15,12 @@ namespace SistemaAcademico.Tests.Integration
 {
     public class SecurityWebApplicationFactory : WebApplicationFactory<Program>
     {
+        private readonly string _dbName = Guid.NewGuid().ToString();
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
             {
-                // 1. ELIMINACIÓN AGRESIVA de cualquier rastro de DbContext (MySQL)
                 var descriptors = services.Where(
                     d => d.ServiceType == typeof(DbContextOptions<SistemaAcademicoContext>) ||
                          d.ServiceType.FullName.Contains("DbContextOptions")).ToList();
@@ -29,27 +30,22 @@ namespace SistemaAcademico.Tests.Integration
                     services.Remove(descriptor);
                 }
 
-                // 2. AGREGAR BASE DE DATOS EN MEMORIA
                 services.AddDbContext<SistemaAcademicoContext>(options =>
                 {
-                    options.UseInMemoryDatabase("SecurityTestDb");
-                    // Esto evita que EF Core intente usar comportamientos específicos de MySQL
+                    options.UseInMemoryDatabase(_dbName);
                     options.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning));
                 });
 
-                // 3. SEEDING (Insertar datos mínimos para que no falle el login)
                 var sp = services.BuildServiceProvider();
                 using (var scope = sp.CreateScope())
                 {
                     var scopedServices = scope.ServiceProvider;
                     var db = scopedServices.GetRequiredService<SistemaAcademicoContext>();
-                    db.Database.EnsureDeleted(); // Limpiamos para evitar conflictos
+
                     db.Database.EnsureCreated();
 
-                    // AGREGAR ESTO:
                     if (!db.Usuarios.Any())
                     {
-                        // 1. Crear el Usuario
                         var testUser = new Usuario
                         {
                             CorreoInstitucional = "admin@test.com",
@@ -65,21 +61,18 @@ namespace SistemaAcademico.Tests.Integration
                         db.Usuarios.Add(testUser);
                         db.SaveChanges();
 
-                        // 2. Crear el Rol (Administrador)
-                        // Nota: Si ya tienes roles en tu tabla, asegúrate que el ID o Nombre coincida
                         var adminRole = db.Rols.FirstOrDefault(r => r.Descripcion == "Administrador");
                         if (adminRole == null)
                         {
                             adminRole = new Rol { Descripcion = "Administrador" };
                             db.Rols.Add(adminRole);
-                            db.SaveChanges(); 
+                            db.SaveChanges();
                         }
 
-                        // 3. Crear la relación UsuarioRol ACTIVA
                         db.UsuarioRols.Add(new UsuarioRol
                         {
                             IdUsuario = testUser.IdUsuario,
-                            IdRol = adminRole.RolId,   
+                            IdRol = adminRole.RolId,
                             Estatus = "Activo"
                         });
 
@@ -88,7 +81,7 @@ namespace SistemaAcademico.Tests.Integration
                 }
             });
 
-            builder.UseEnvironment("Testing"); // Forzamos entorno Testing
+            builder.UseEnvironment("Testing");
         }
     }
 }

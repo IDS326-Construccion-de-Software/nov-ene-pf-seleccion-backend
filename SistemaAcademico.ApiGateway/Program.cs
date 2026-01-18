@@ -5,9 +5,11 @@ using Microsoft.OpenApi.Models;
 using SistemaAcademico.AcademicProgress.Core.Interfaces;
 using SistemaAcademico.AcademicProgress.Core.Services;
 using SistemaAcademico.AcademicProgress.Infrastructure.Persistence.Repositories;
+using SistemaAcademico.ApiGateway.Middleware;
 using SistemaAcademico.Authentication.Infrastructure;
 using SistemaAcademico.Persistence.Models;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,34 @@ var serverVersion = ServerVersion.AutoDetect(connectionString);
 builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
 {
     options.UseMySql(connectionString, serverVersion);
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.AddServerHeader = false;
+
+    // Límite global de 1MB por petición
+    serverOptions.Limits.MaxRequestBodySize = 1 * 1024 * 1024;
+});
+
+
+// Configurar Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    // Si alguien abusa, devolvemos 429 (Too Many Requests)
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Política Global: Máximo 100 peticiones cada 1 minuto por cada IP
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? httpContext.Request.Headers.Host.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 100,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
 });
 
 // Add services to the container.
@@ -87,20 +117,27 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
+app.UseRateLimiter();
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sistema Academico V1");
+        // c.RoutePrefix = string.Empty; // Si descomentas esto, Swagger sale en la raíz
+    });
 }
 
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
 
 

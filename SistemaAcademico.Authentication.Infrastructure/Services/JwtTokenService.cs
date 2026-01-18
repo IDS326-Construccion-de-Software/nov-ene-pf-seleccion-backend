@@ -29,7 +29,6 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
 
             var claims = new List<Claim>
             {
-                // Ajusta 'IdUsuario' según tu entidad real (Id vs IdUsuario)
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.IdUsuario.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, usuario.CorreoInstitucional),
                 new Claim(ClaimTypes.Role, rolNombre),

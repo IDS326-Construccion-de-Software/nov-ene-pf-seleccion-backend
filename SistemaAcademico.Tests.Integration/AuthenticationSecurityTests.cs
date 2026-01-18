@@ -23,7 +23,6 @@ namespace SistemaAcademico.Tests.Integration
         [Fact]
         public async Task OWASP_A07_BruteForce_Protection_Works()
         {
-            // Asegúrate que 'Email' y 'Password' existan en tu clase LoginRequest
             var badLogin = new { CorreoInstitucional = "hacker@test.com", Password = "ClaveEquivocada123!" };
 
             // 5 intentos fallidos
@@ -86,6 +85,55 @@ namespace SistemaAcademico.Tests.Integration
             content.Should().NotContain("ClaveHash");
             content.Should().NotContain("PasswordHash");
             content.Should().NotContain("Salt");
+        }
+
+        [Fact]
+        public async Task Login_WithHugePayload_ShouldReturnBadRequestOrTooLarge()
+        {
+            // ARRANGE: 1.1 MB para asegurar que supere el límite de 1MB
+            string hugeEmail = new string('A', 1100000);
+
+            // Usamos el endpoint de Login porque es público
+            var request = new
+            {
+                Email = hugeEmail,
+                Password = "Password123!"
+            };
+
+            // ACT: Enviamos al LOGIN
+            var response = await _client.PostAsJsonAsync("/api/auth/login", request);
+
+            // ASSERT
+            int statusCode = (int)response.StatusCode;
+
+            // Ahora sí, el sistema lo rechazará por tamaño (413) o por validación (400)
+            // Pero NO por 401 porque el login es público.
+            statusCode.Should().Match(s => s == 400 || s == 413,
+                $"Se esperaba un rechazo por tamaño, pero se recibió {statusCode}");
+        }
+
+        [Theory]
+        [InlineData("admin@test.com", "ClaveMal123!")]
+        [InlineData("noexiste@test.com", "CualquierClave")]
+        public async Task ChangePassword_ShouldReturnSameError_RegardlessOfReason(string email, string pass)
+        {
+            var request = new
+            {
+                CorreoInstitucional = email,
+                PasswordActual = pass,
+                NuevaPassword = "NewSecurePass123!",
+                ConfirmarPassword = "NewSecurePass123!"
+            };
+
+            var response = await _client.PostAsJsonAsync("/api/auth/change-password", request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                throw new Exception($"El servidor devolvió 400. Detalles: {body}");
+            }
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
         }
     }
 }

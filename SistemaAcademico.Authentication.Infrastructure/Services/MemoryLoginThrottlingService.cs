@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SistemaAcademico.Authentication.Core.Interfaces;
 using SistemaAcademico.Persistence.Models;
@@ -19,12 +20,14 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
         private readonly IMemoryCache _cache;
         private readonly int _maxAttempts;
         private readonly int _lockoutMinutes;
+        private readonly ILogger<MemoryLoginThrottlingService> _logger;
 
-        public MemoryLoginThrottlingService(IMemoryCache cache, IConfiguration configuration)
+        public MemoryLoginThrottlingService(IMemoryCache cache, IConfiguration configuration, ILogger<MemoryLoginThrottlingService> logger)
         {
             _cache = cache;
+            _logger = logger;
 
-            // Leemos la configuración. Si no existe, usamos valores por defecto seguros (5 intentos, 15 min)
+            // Leemos la configuración. Si no existe, usamos valores por defecto seguros (5 intentos, 7 min)
             var section = configuration.GetSection("LoginThrottling");
             string? maxAttemptsVal = section["MaxFailedAttempts"];
             string? lockoutMinVal = section["LockoutMinutes"];
@@ -54,11 +57,15 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
             intentos++;
             _cache.Set(attemptsKey, intentos);
 
-            // Si superó el límite, creamos la llave de BLOQUEO
             if (intentos >= _maxAttempts)
             {
                 // El bloqueo expira automáticamente después del tiempo configurado
                 _cache.Set($"BLOCK_{key}", true, TimeSpan.FromMinutes(_lockoutMinutes));
+
+                _logger.LogWarning(
+                    "SEGURIDAD: Intento de fuerza bruta detectado. Usuario {Email} ha sido BLOQUEADO por {Minutes} minutos.", 
+                    key, _lockoutMinutes
+                );
             }
 
             return Task.CompletedTask;

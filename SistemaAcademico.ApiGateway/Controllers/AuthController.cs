@@ -22,69 +22,30 @@ namespace SistemaAcademico.ApiGateway.Controllers
         {
             _authService = authService;
         }
-        
+
         [HttpPost("create-user")]
-        // TODO: Descomentar despues de crear el primer user admin
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request)
         {
-            try
-            {
-                await _authService.CrearUsuarioAsync(request);
-                return Ok(new { message = $"Usuario {request.CorreoInstitucional} creado exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            await _authService.CrearUsuarioAsync(request);
+            return Ok(new { message = $"Usuario {request.CorreoInstitucional} creado exitosamente." });
         }
-        [AllowAnonymous]
+
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            try
-            {
-                var result = await _authService.LoginAsync(request);
-                return Ok(result);
-            }
-            catch (PasswordChangeRequiredException)
-            {
-                return StatusCode(403, new { 
-                    error = "Cambio de contraseña requerido." ,
-                    message = "Por seguridad, debe cambiar su contraseña antes de continuar."
-                });
-            }
-            catch (AccountBlockedException ex)
-            {
-                return StatusCode(403, new { error = ex.Message });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Error interno del servidor." });
-            }
-
+            // El Middleware atrapará PasswordChangeRequired, AccountBlocked y UnauthorizedAccess
+            var result = await _authService.LoginAsync(request);
+            return Ok(result);
         }
 
         [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            try
-            {
-                var result = await _authService.RefreshTokenAsync(request);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized(new { error = ex.Message });
-            }
+            var result = await _authService.RefreshTokenAsync(request);
+            return Ok(result);
         }
 
         [AllowAnonymous]
@@ -102,20 +63,8 @@ namespace SistemaAcademico.ApiGateway.Controllers
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            try
-            {
-                await _authService.CambiarPasswordAsync(request);
-                return Ok(new { message = "Contraseña actualizada exitosamente. Por favor inicie sesión." });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { error = ex.Message }); 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            await _authService.CambiarPasswordAsync(request);
+            return Ok(new { message = "Contraseña actualizada exitosamente." });
         }
 
         // ESCENARIO 3 (Paso 1): Solicitar Recuperación (Envío de OTP)
@@ -123,15 +72,8 @@ namespace SistemaAcademico.ApiGateway.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
         {
-            try
-            {
-                await _authService.SolicitarRecuperacionAsync(request);
-                return Ok(new { message = "Si el correo es correcto, se han enviado las instrucciones." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            await _authService.SolicitarRecuperacionAsync(request);
+            return Ok(new { message = "Si el correo es correcto, se han enviado las instrucciones." });
         }
 
         // ESCENARIO 3 (Paso 2): Resetear Contraseña (Con OTP)
@@ -139,20 +81,8 @@ namespace SistemaAcademico.ApiGateway.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            try
-            {
-                await _authService.ResetearPasswordConOtpAsync(request);
-                return Ok(new { message = "Contraseña restablecida correctamente. Ya puede iniciar sesión." });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            await _authService.ResetearPasswordConOtpAsync(request);
+            return Ok(new { message = "Contraseña restablecida correctamente." });
         }
     }
 }
