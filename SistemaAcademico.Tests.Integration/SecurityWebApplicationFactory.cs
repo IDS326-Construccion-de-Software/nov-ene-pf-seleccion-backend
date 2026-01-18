@@ -53,7 +53,7 @@ namespace SistemaAcademico.Tests.Integration
                         {
                             CorreoInstitucional = "admin@test.com",
                             // Nota: Si usas BCrypt, pon aquí el hash de "Admin123!"
-                            ClaveHash = "$2a$11$ev6M7sS5.Hh5y1XmZ5vVeu.Hh5y1XmZ5vVeu.Hh5y1XmZ5vVeu",
+                            ClaveHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
                             CambioClaveSolicitado = false,
                             Nombre = "Admin",
                             Apellido = "Pruebas",
