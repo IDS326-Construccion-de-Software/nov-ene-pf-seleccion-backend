@@ -52,7 +52,6 @@ namespace SistemaAcademico.Tests.Integration
                         // 1. Crear el Usuario
                         var testUser = new Usuario
                         {
-                            IdUsuario = 1, // Asignamos ID fijo para la relación
                             CorreoInstitucional = "admin@test.com",
                             ClaveHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
                             CambioClaveSolicitado = false,
@@ -64,17 +63,23 @@ namespace SistemaAcademico.Tests.Integration
                             Telefono = "0000000000"
                         };
                         db.Usuarios.Add(testUser);
+                        db.SaveChanges();
 
                         // 2. Crear el Rol (Administrador)
                         // Nota: Si ya tienes roles en tu tabla, asegúrate que el ID o Nombre coincida
-                        var adminRole = new Rol { RolId = 1, Descripcion = "Administrador" };
-                        db.Rols.Add(adminRole);
+                        var adminRole = db.Rols.FirstOrDefault(r => r.Descripcion == "Administrador");
+                        if (adminRole == null)
+                        {
+                            adminRole = new Rol { Descripcion = "Administrador" };
+                            db.Rols.Add(adminRole);
+                            db.SaveChanges(); 
+                        }
 
                         // 3. Crear la relación UsuarioRol ACTIVA
                         db.UsuarioRols.Add(new UsuarioRol
                         {
-                            IdUsuario = 1,
-                            IdRol = 1,
+                            IdUsuario = testUser.IdUsuario,
+                            IdRol = adminRole.RolId,   
                             Estatus = "Activo"
                         });
 
