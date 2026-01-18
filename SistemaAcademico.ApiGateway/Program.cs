@@ -18,8 +18,15 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
-var serverVersion = ServerVersion.AutoDetect(connectionString);
-
+ServerVersion serverVersion;
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    serverVersion = new MySqlServerVersion(new Version(8, 0, 31)); // Versión genérica para tests
+}
+else
+{
+    serverVersion = ServerVersion.AutoDetect(connectionString);
+}
 
 builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
 {
