@@ -77,7 +77,7 @@ namespace SistemaAcademico.Authentication.Core.Services
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
             if (await _throttlingService.EstaBloqueadoAsync(request.CorreoInstitucional))
-                throw new UnauthorizedAccessException("Cuenta bloqueada temporalmente. Intente más tarde.");
+                throw new AccountBlockedException("Cuenta bloqueada temporalmente por seguridad.");
 
             var usuario = await _repository.ObtenerUsuarioLoginAsync(request.CorreoInstitucional);
 

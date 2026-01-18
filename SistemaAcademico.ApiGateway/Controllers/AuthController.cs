@@ -56,6 +56,10 @@ namespace SistemaAcademico.ApiGateway.Controllers
                     message = "Por seguridad, debe cambiar su contraseña antes de continuar."
                 });
             }
+            catch (AccountBlockedException ex)
+            {
+                return StatusCode(403, new { error = ex.Message });
+            }
             catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized(new { error = ex.Message });
@@ -64,6 +68,7 @@ namespace SistemaAcademico.ApiGateway.Controllers
             {
                 return StatusCode(500, new { error = "Error interno del servidor." });
             }
+
         }
 
         [AllowAnonymous]

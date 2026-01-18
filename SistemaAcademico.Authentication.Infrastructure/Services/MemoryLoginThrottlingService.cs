@@ -30,7 +30,7 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
             string? lockoutMinVal = section["LockoutMinutes"];
 
             _maxAttempts = int.TryParse(maxAttemptsVal, out int m) ? m : 5;
-            _lockoutMinutes = int.TryParse(lockoutMinVal, out int l) ? l : 15;
+            _lockoutMinutes = int.TryParse(lockoutMinVal, out int l) ? l : 7;
         }
 
         public Task<bool> EstaBloqueadoAsync(string key)

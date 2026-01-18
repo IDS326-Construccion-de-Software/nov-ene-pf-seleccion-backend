@@ -1,0 +1,34 @@
+name: Seguridad OWASP Top 10
+
+on:
+  push:
+    branches: [ "feature/security" ]
+  pull_request:
+    branches: [ "feature/security" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Descargar Código
+      uses: actions/checkout@v4
+
+    - name: 2. Configurar .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 3. Restaurar Librerías
+      run: dotnet restore
+
+    # --- OWASP A06: Análisis de Librerías Vulnerables ---
+    - name: 4. Escaneo de Vulnerabilidades NuGet
+      run: dotnet list package --vulnerable --include-transitive
+
+    - name: 5. Compilar Proyecto
+      run: dotnet build --configuration Release --no-restore
+
+    # --- OWASP A01, A05, A07: Ejecutar tus Tests de Integración ---
+    - name: 6. Ejecutar Pruebas de Seguridad (xUnit)
+      run: dotnet test --configuration Release --no-build --verbosity normal
