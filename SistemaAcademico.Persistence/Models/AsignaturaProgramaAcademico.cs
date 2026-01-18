@@ -5,19 +5,21 @@ namespace SistemaAcademico.Persistence.Models;
 
 public partial class AsignaturaProgramaAcademico
 {
-    public int IdAsignatura { get; set; }
+    public string IdAsignatura { get; set; } = null!;
 
     public int IdProgramaAcademico { get; set; }
 
-    public string PreRequisitos { get; set; } = null!;
+    public List<string> PreRequisitos { get; set; } = new List<string>();
 
-    public int Corequisito { get; set; }
+    public string? Corequisito { get; set; }
 
     public int Creditos { get; set; }
 
-    public int? TrimestreSegunPensum { get; set; }
+    public int Periodo { get; set; }
 
-    public virtual Asignatura CorequisitoNavigation { get; set; } = null!;
+    public virtual Asignatura? CorequisitoNavigation { get; set; }
 
     public virtual Asignatura IdAsignaturaNavigation { get; set; } = null!;
+
+    public virtual ProgramaAcademico IdProgramaAcademicoNavigation { get; set; } = null!;
 }

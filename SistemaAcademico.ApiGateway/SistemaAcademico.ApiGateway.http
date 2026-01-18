@@ -4,3 +4,33 @@ GET {{SistemaAcademico.ApiGateway_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Login - Estudiante (Maria Gomez)
+POST {{SistemaAcademico.ApiGateway_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "correoInstitucional": "m.gomez@institucional.edu.do",
+  "password": "Candado6947!"
+}
+
+###
+
+# Login - Profesor (Juan Perez)
+POST {{SistemaAcademico.ApiGateway_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "correoInstitucional": "j.perez@institucional.edu.do",
+  "password": "Candado6947!"
+}
+
+###
+
+# Obtener información completa del usuario logueado
+# Nota: Reemplaza 'YOUR_ACCESS_TOKEN' con el token obtenido del login
+GET {{SistemaAcademico.ApiGateway_HostAddress}}/api/auth/me
+Authorization: Bearer YOUR_ACCESS_TOKEN
+Accept: application/json
+
+###

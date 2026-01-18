@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,7 +61,7 @@ namespace SistemaAcademico.ApiGateway.Controllers
             {
                 return Unauthorized(new { error = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, new { error = "Error interno del servidor." });
             }
@@ -143,6 +144,31 @@ namespace SistemaAcademico.ApiGateway.Controllers
             catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // Obtener información completa del usuario logueado
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetUsuarioCompleto()
+        {
+            try
+            {
+                // Obtener el ID del usuario del token JWT
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim == null)
+                    return Unauthorized(new { error = "No se pudo identificar al usuario." });
+
+                if (!int.TryParse(userIdClaim.Value, out int userId))
+                    return BadRequest(new { error = "ID de usuario inválido." });
+
+                var usuario = await _authService.ObtenerUsuarioCompletoAsync(userId);
+                return Ok(usuario);
             }
             catch (Exception ex)
             {

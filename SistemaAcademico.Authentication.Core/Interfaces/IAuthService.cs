@@ -16,5 +16,6 @@ namespace SistemaAcademico.Authentication.Core.Interfaces
         Task CambiarPasswordAsync(ChangePasswordDto dto);
         Task SolicitarRecuperacionAsync(ForgotPasswordDto dto);
         Task ResetearPasswordConOtpAsync(ResetPasswordDto dto);
+        Task<UsuarioCompletoDto> ObtenerUsuarioCompletoAsync(int idUsuario);
     }
 }
