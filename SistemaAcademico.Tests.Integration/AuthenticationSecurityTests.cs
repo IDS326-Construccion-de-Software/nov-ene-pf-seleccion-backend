@@ -49,7 +49,7 @@ namespace SistemaAcademico.Tests.Integration
         public async Task OWASP_A01_Endpoint_Register_IsRestrictedToAdmins()
         {
             // Arrange: Un usuario anónimo intenta registrar a alguien
-            var newUser = new { Email = "nuevo@academia.com", Password = "Password123!", Role = "Profesor" };
+            var newUser = new { CorreoInstitucional = "nuevo@academia.com", Password = "Password123!", Role = "Profesor" };
 
             // Act: Llamada sin Token de Administrador
             var response = await _client.PostAsJsonAsync("/api/auth/create-user", newUser);
