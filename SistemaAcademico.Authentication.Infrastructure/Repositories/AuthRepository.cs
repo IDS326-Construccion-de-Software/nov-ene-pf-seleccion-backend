@@ -54,8 +54,16 @@ namespace SistemaAcademico.Authentication.Infrastructure.Repositories
         public async Task<Usuario?> ObtenerUsuarioPorIdAsync(int idUsuario)
         {
             return await _context.Usuarios
+                .Include(u => u.IdRolNavigation)
                 .Include(u => u.UsuarioRols)
-                .ThenInclude(ur => ur.IdRolNavigation)
+                    .ThenInclude(ur => ur.IdRolNavigation)
+                .Include(u => u.UsuarioProgramaAcademicos)
+                    .ThenInclude(upa => upa.IdProgramaAcademicoNavigation)
+                        .ThenInclude(pa => pa.IdCarreraNavigation)
+                            .ThenInclude(c => c.IdAreaAcademicaNavigation)
+                .Include(u => u.Profesor)
+                .Include(u => u.UsuarioAreaAcademicas)
+                    .ThenInclude(uaa => uaa.IdAreaAcademicaNavigation)
                 .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
         }
         //public async Task<UsuarioRefreshToken?> ObtenerRefreshTokenAsync(string token)

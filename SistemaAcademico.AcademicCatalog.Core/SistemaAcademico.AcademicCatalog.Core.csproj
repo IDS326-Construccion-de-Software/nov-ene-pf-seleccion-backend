@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs/Section/" />
     <Folder Include="DTOs\" />
     <Folder Include="Entities\" />
     <Folder Include="Interfaces\" />
@@ -15,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SistemaAcademico.SharedKernel.Core\SistemaAcademico.SharedKernel.Core.csproj" />
+    <ProjectReference Include="..\SistemaAcademico.Persistence\SistemaAcademico.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

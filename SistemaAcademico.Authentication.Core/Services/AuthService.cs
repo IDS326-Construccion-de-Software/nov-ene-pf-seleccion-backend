@@ -272,5 +272,69 @@ namespace SistemaAcademico.Authentication.Core.Services
                 <p style='font-weight: bold;'>Si NO fuiste tú, por favor contacta a soporte inmediatamente.</p>
             </div>";
         }
+
+        public async Task<UsuarioCompletoDto> ObtenerUsuarioCompletoAsync(int idUsuario)
+        {
+            var usuario = await _repository.ObtenerUsuarioPorIdAsync(idUsuario);
+
+            if (usuario == null)
+                throw new Exception("Usuario no encontrado.");
+
+            var dto = new UsuarioCompletoDto
+            {
+                IdUsuario = usuario.IdUsuario,
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Nacionalidad = usuario.Nacionalidad,
+                Direccion = usuario.Direccion,
+                CorreoPersonal = usuario.CorreoPersonal,
+                FechaIngreso = usuario.FechaIngreso,
+                IdRol = usuario.IdRol,
+                Role = usuario.IdRolNavigation?.Descripcion ?? "",
+                CorreoInstitucional = usuario.CorreoInstitucional
+            };
+
+            // Si es estudiante (IdRol == 2)
+            if (usuario.IdRol == 2)
+            {
+                var programaAcademico = usuario.UsuarioProgramaAcademicos.FirstOrDefault();
+                if (programaAcademico != null)
+                {
+                    dto.IdProgramaAcademico = programaAcademico.IdProgramaAcademico;
+                    dto.NombreProgramaAcademico = programaAcademico.IdProgramaAcademicoNavigation?.IdCarreraNavigation?.Nombre ?? "";
+                    dto.FechaInscripcion = programaAcademico.FechaInscripcion;
+                    dto.Estatus = programaAcademico.Estatus;
+                    dto.Permanencia = programaAcademico.Permanencia;
+                    dto.TrimestreActual = programaAcademico.TrimestreActual;
+
+                    // Área académica del programa (a través de Carrera)
+                    var areaAcademica = programaAcademico.IdProgramaAcademicoNavigation?.IdCarreraNavigation?.IdAreaAcademicaNavigation;
+                    if (areaAcademica != null)
+                    {
+                        dto.IdAreaAcademica = areaAcademica.AreaAcademicaId;
+                        dto.NombreAreaAcademica = areaAcademica.AreaAcademicaNombre;
+                    }
+                }
+            }
+
+            // Si es profesor (IdRol == 1)
+            if (usuario.IdRol == 1 && usuario.Profesor != null)
+            {
+                dto.GradoAcademico = usuario.Profesor.GradoAcademico;
+                dto.Especialidad = usuario.Profesor.Especialidad;
+                dto.FechaContratacion = usuario.Profesor.FechaContratacion;
+                dto.Bio = usuario.Profesor.Bio;
+
+                // Área académica del profesor
+                var areaProfesor = usuario.UsuarioAreaAcademicas.FirstOrDefault();
+                if (areaProfesor != null)
+                {
+                    dto.IdAreaAcademica = areaProfesor.IdAreaAcademica;
+                    dto.NombreAreaAcademica = areaProfesor.IdAreaAcademicaNavigation?.AreaAcademicaNombre ?? "";
+                }
+            }
+
+            return dto;
+        }
     }
 }
