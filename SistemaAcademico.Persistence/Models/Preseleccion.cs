@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using SistemaAcademico.Persistence.Data;
 
 namespace SistemaAcademico.Persistence.Models;
 
-public partial class Seleccion
+public partial class Preseleccion
 {
     public int Id { get; set; }
 
@@ -16,19 +15,13 @@ public partial class Seleccion
 
     public DateTime FechaRegistro { get; set; }
 
-    public bool VieneDePreseleccion { get; set; }
-
-    public DateTime? FechaConfirmacion { get; set; }
-
-    public SeleccionEstatus EstatusAcademico { get; set; }
+    public bool Procesada { get; set; }
 
     public bool Activa { get; set; }
 
-    public bool Definitiva { get; set; }
-
     public virtual Seccion IdSeccionNavigation { get; set; } = null!;
 
-    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
-
     public virtual PeriodoConfig IdPeriodoNavigation { get; set; } = null!;
+
+    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
 }
