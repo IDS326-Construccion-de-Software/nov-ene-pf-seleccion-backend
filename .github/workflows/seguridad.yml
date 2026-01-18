@@ -1,4 +1,4 @@
-name: Seguridad OWASP Top 10
+name: Seguridad OWASP Top 10 y CodeQL
 
 on:
   push:
@@ -9,6 +9,11 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
 
     steps:
     - name: 1. Descargar Código
@@ -19,16 +24,26 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: 3. Restaurar Librerías
+    - name: 3. Inicializar CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: 'csharp'
+        queries: security-extended,security-and-quality
+
+    - name: 4. Restaurar Librerías
       run: dotnet restore
 
     # --- OWASP A06: Análisis de Librerías Vulnerables ---
-    - name: 4. Escaneo de Vulnerabilidades NuGet
+    - name: 5. Escaneo de Vulnerabilidades NuGet
       run: dotnet list package --vulnerable --include-transitive
 
-    - name: 5. Compilar Proyecto
+    # --- COMPILACIÓN (CodeQL la observa en este punto) ---
+    - name: 6. Compilar Proyecto
       run: dotnet build --configuration Release --no-restore
 
-    # --- OWASP A01, A05, A07: Ejecutar tus Tests de Integración ---
-    - name: 6. Ejecutar Pruebas de Seguridad (xUnit)
+    - name: 7. Realizar Análisis CodeQL
+      uses: github/codeql-action/analyze@v3
+
+    # --- OWASP A01, A05, A07: Tus Tests de Integración ---
+    - name: 8. Ejecutar Pruebas de Seguridad (xUnit)
       run: dotnet test --configuration Release --no-build --verbosity normal
