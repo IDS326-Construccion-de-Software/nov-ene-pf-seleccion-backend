@@ -62,9 +62,12 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
                 // El bloqueo expira automáticamente después del tiempo configurado
                 _cache.Set($"BLOCK_{key}", true, TimeSpan.FromMinutes(_lockoutMinutes));
 
+                var sanitizedEmail = key.Replace('\n', '_').Replace('\r', '_');
+                if (sanitizedEmail.Length > 100) sanitizedEmail = sanitizedEmail.Substring(0, 100);
+
                 _logger.LogWarning(
                     "SEGURIDAD: Intento de fuerza bruta detectado. Usuario {Email} ha sido BLOQUEADO por {Minutes} minutos.", 
-                    key, _lockoutMinutes
+                    sanitizedEmail, _lockoutMinutes
                 );
             }
 
