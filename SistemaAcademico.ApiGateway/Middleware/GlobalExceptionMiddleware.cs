@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using SistemaAcademico.Authentication.Core.Exceptions;
 using System.Net;
-using System.Text.Json;
 
 namespace SistemaAcademico.ApiGateway.Middleware
 {
@@ -91,10 +92,12 @@ namespace SistemaAcademico.ApiGateway.Middleware
                 error = message,
             };
 
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            }));
+            return context.Response.WriteAsync(
+                JsonConvert.SerializeObject(response, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                })
+            );
         }
     }
 }
