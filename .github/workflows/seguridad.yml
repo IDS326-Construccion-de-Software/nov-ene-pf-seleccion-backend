@@ -2,9 +2,10 @@ name: Seguridad OWASP Top 10 y CodeQL
 
 on:
   push:
-    branches: [ "feature/security" ]
+    branches: [ "dev", "feature/security" ]
   pull_request:
-    branches: [ "feature/security" ]
+    branches: [ "dev", "feature/security" ]
+
 
 jobs:
   build-and-test:
