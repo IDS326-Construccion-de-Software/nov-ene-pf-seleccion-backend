@@ -12,12 +12,10 @@ using SistemaAcademico.AcademicProgress.Core.Services;
 using SistemaAcademico.AcademicProgress.Infrastructure.Persistence.Repositories;
 using SistemaAcademico.ApiGateway.Middleware;
 using SistemaAcademico.Authentication.Infrastructure;
-using SistemaAcademico.SelecctionAndPreselecction.Core.Interfaces;
-using SistemaAcademico.SelecctionAndPreselecction.Core.Services;
-using SistemaAcademico.SelecctionAndPreselecction.Infrastructure.Persistence.Repositories;
-using SistemaAcademico.Persistence.Models;
-using System.Text;
 using System.Threading.RateLimiting;
+using SistemaAcademico.SelecctionAndPreselecction.Core.Interfaces;
+using SistemaAcademico.SelecctionAndPreselecction.Infrastructure.Persistence.Repositories;
+using SistemaAcademico.SelecctionAndPreselecction.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,20 +34,20 @@ else
     serverVersion = ServerVersion.AutoDetect(connectionString);
 }
 
-// builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
-// {
-//     options.UseMySql(connectionString, serverVersion);
-// });
+builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
+{
+    options.UseMySql(connectionString, serverVersion);
+});
 
 // Data Seeding
-builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
-  options.UseMySql(connectionString, serverVersion)
-  .UseSeeding((context, _) =>
-  {
-    var appContext = (SistemaAcademicoContext)context;
-    DataSeeder.SeedData(appContext);
-  })
-);
+//builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
+//  options.UseMySql(connectionString, serverVersion)
+//  .UseSeeding((context, _) =>
+//  {
+//    var appContext = (SistemaAcademicoContext)context;
+//    DataSeeder.SeedData(appContext);
+//  })
+//);
 
 // Repositories
 builder.Services.AddScoped<IAcademicAreaRepository, AcademicAreaRepository>();
