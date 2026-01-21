@@ -17,6 +17,15 @@ namespace SistemaAcademico.Retirement.Core.Services
 
         public async Task<string> Retirar(SeleccionRetirementDTO slrDTO)
         {
+            var now = DateTime.Now;
+            var per = await context.PeriodoConfigs
+                .Where(p => p.Codigo == slrDTO.PeriodoAcademico)
+                .OrderByDescending(p => p.SeleccionFin)
+                .FirstOrDefaultAsync();
+            if (per == null) return "Perido no activo";
+
+            if (now < per.RetiroInicio || now >= per.RetiroFin) return "No puede retirar en este momento";
+
             var rets = await context.Seleccions
                 .Include(s => s.IdSeccionNavigation)
                 .CountAsync(rets => rets.IdSeccionNavigation.IdAsignatura == slrDTO.Asignatura
@@ -27,12 +36,11 @@ namespace SistemaAcademico.Retirement.Core.Services
 
             var sel = await context.Seleccions.FirstOrDefaultAsync(sel => sel.IdSeccion == slrDTO.IdSeccion
                 && sel.IdUsuario == slrDTO.IdUsuario
-                && sel.EstatusAcademico != SeleccionEstatus.Retirado);
+                && sel.EstatusAcademico == SeleccionEstatus.Cursando);
 
             if (sel == null) return "Usted no está inscrito a esta sección de la asignatura, esta no existe o ya se ha retirado";
 
             sel.EstatusAcademico = SeleccionEstatus.Retirado;
-            // sel.Comentario = slrDTO.Comentario; // Comentario removed from Seleccion model per new schema
 
             await context.SaveChangesAsync();
             
