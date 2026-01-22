@@ -656,7 +656,14 @@ public partial class SistemaAcademicoContext : DbContext
             entity.Property(e => e.IdUsuario).HasColumnName("ID_Usuario");
             entity.Property(e => e.IdAsignatura).HasMaxLength(10).HasColumnName("ID_Asignatura");
             entity.Property(e => e.IdPeriodo).HasColumnName("ID_Periodo");
-            entity.Property(e => e.Calificacion).HasPrecision(5, 2);
+            entity.Property(e => e.Calificacion)
+               .HasPrecision(5, 2)
+               .HasColumnName("Calificacion");
+
+            entity.Property(e => e.CalificacionMediotermino)
+               .HasPrecision(5, 2)
+               .HasColumnName("Calificacion_Mediotermino");
+
             entity.Property(e => e.Estatus).HasConversion<int>();
             entity.Property(e => e.FechaRegistro).HasColumnName("Fecha_Registro");
 

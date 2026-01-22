@@ -52,10 +52,14 @@ namespace SistemaAcademico.Persistence.Data
 
     public enum HistorialEstatus
     {
+        Cursando,
         Aprobado,
         Reprobado,
+        Retirado
         Convalidado,
         Exonerado
+        Seleccionado,
+        Preseleccionado
     }
 
     public enum DiaSemana
