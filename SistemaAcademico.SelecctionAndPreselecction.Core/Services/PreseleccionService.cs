@@ -95,8 +95,8 @@ public class PreseleccionService : IPreseleccionService
                                 Motivo = "Choque de horario",
                                 DetalleAsignatura = existente.IdSeccionNavigation.IdAsignaturaNavigation.Nombre,
                                 Dia = existente.Dia.ToString(),
-                                HoraInicio = existente.HoraInicio.ToString(@"hh\:mm"),
-                                HoraFin = existente.HoraFin.ToString(@"hh\:mm")
+                                HoraInicio = existente.HoraInicio.ToString(@"HH\:mm"),
+                                HoraFin = existente.HoraFin.ToString(@"HH\:mm")
                             };
                         }
                     }
@@ -122,8 +122,8 @@ public class PreseleccionService : IPreseleccionService
                                     Motivo = "Choque de horario entre secciones seleccionadas",
                                     DetalleAsignatura = nuevasSecciones[j].IdAsignaturaNavigation.Nombre,
                                     Dia = h1.Dia.ToString(),
-                                    HoraInicio = h1.HoraInicio.ToString(@"hh\:mm"),
-                                    HoraFin = h1.HoraFin.ToString(@"hh\:mm")
+                                    HoraInicio = h1.HoraInicio.ToString(@"HH\:mm"),
+                                    HoraFin = h1.HoraFin.ToString(@"HH\:mm")
                                 };
                             }
                         }

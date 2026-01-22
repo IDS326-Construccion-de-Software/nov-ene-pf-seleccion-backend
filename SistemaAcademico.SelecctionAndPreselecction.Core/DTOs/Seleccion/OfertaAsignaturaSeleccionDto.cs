@@ -12,7 +12,7 @@ public class OfertaAsignaturaSeleccionDto
     public int PeriodoTrimestre { get; set; }
     public bool PuedeSeleccionar { get; set; }
     public string? MotivoBloqueo { get; set; }
-    public bool Procesada { get; set; }
+    public bool Definitiva { get; set; }
     public int TotalSeccionesAsignatura { get; set; }
     public List<SeccionOfertaSeleccionDto> Secciones { get; set; } = new();
 }
