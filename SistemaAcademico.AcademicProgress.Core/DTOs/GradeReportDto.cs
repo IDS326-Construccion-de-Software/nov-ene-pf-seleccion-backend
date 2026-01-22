@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace SistemaAcademico.AcademicProgress.Core.DTOs
 {
@@ -18,12 +17,10 @@ namespace SistemaAcademico.AcademicProgress.Core.DTOs
     /// </summary>
     public class CourseGradeDto
     {
+        public string CourseCode { get; set; } = string.Empty;
         public string CourseName { get; set; } = string.Empty;
         public int Credits { get; set; }
-        //Uncomment the following lines if you want to ignore null values during JSON serialization
-        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? NumericGrade { get; set; }
-        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? LetterGrade { get; set; }
     }
 }

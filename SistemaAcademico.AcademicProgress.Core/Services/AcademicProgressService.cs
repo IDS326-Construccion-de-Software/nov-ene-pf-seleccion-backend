@@ -1,6 +1,7 @@
 ﻿using SistemaAcademico.AcademicProgress.Core.DTOs;
 using SistemaAcademico.AcademicProgress.Core.Entities;
 using SistemaAcademico.AcademicProgress.Core.Interfaces;
+using SistemaAcademico.Persistence.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,6 @@ using System.Threading.Tasks;
 
 namespace SistemaAcademico.AcademicProgress.Core.Services
 {
-    /// <summary>
-    /// Implementa la lógica de negocio para calcular el progreso académico de un estudiante.
-    /// </summary>
     public class AcademicProgressService : IAcademicProgressService
     {
         private readonly IAcademicProgressRepository _repository;
@@ -55,8 +53,8 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
         /// <inheritdoc />
         public async Task<GradeReportDto?> GetFinalGradesReportAsync(int studentId, int year, int trimester)
         {
-            var period = $"{year}-T{trimester}"; // Corrected period format
-            var statesToInclude = new[] { "Aprobado", "Reprobado", "Retirado" };
+            var period = $"{year}-{trimester:D2}"; // Format: 2026-01
+            var statesToInclude = new[] { HistorialEstatus.Aprobado, HistorialEstatus.Reprobado, HistorialEstatus.Retirado };
             var gradesData = await _repository.GetGradesByPeriodAsync(studentId, period, statesToInclude);
 
             if (!gradesData.Any()) return null;
@@ -67,11 +65,10 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
                 Period = period,
                 Courses = gradesData.Select(g => new CourseGradeDto
                 {
+                    CourseCode = g.CourseCode, // Added this mapping
                     CourseName = g.CourseName,
                     Credits = g.Credits,
-                    // NumericGrade is intentionally left null
-                    // Buisness rule: only LetterGrade is provided for final grades report
-                    LetterGrade = g.Status == "Retirado"
+                    LetterGrade = g.Status == HistorialEstatus.Retirado
                         ? "R"
                         : g.FinalGrade.HasValue ? ConvertToLetterGrade(g.FinalGrade.Value) : null
                 }).ToList()
@@ -83,8 +80,8 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
         /// <inheritdoc />
         public async Task<GradeReportDto?> GetMidtermGradesReportAsync(int studentId, int year, int trimester)
         {
-            var period = $"{year}-T{trimester}"; // Corrected period format
-            var statesToInclude = new[] { "Cursando", "Retirado", "Aprobado", "Reprobado" };
+            var period = $"{year}-{trimester:D2}"; // Format: 2026-01
+            var statesToInclude = new[] { HistorialEstatus.Cursando, HistorialEstatus.Retirado };
             var gradesData = await _repository.GetGradesByPeriodAsync(studentId, period, statesToInclude);
 
             if (!gradesData.Any()) return null;
@@ -95,10 +92,11 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
                 Period = period,
                 Courses = gradesData.Select(g => new CourseGradeDto
                 {
+                    CourseCode = g.CourseCode, // Added this mapping
                     CourseName = g.CourseName,
                     Credits = g.Credits,
-                    NumericGrade = null, // MidtermGrade removed from schema
-                    LetterGrade = g.Status == "Retirado" ? "R" : null
+                    NumericGrade = g.Status == HistorialEstatus.Retirado ? null : g.MidtermGrade,
+                    LetterGrade = g.Status == HistorialEstatus.Retirado ? "R" : null
                 }).ToList()
             };
 
@@ -110,10 +108,7 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
         {
             var allCourses = await _repository.GetAllCompletedCoursesForStudentAsync(studentId);
 
-            if (!allCourses.Any())
-            {
-                return null;
-            }
+            if (!allCourses.Any()) return null;
 
             var firstCourse = allCourses.First();
             var historyReport = new AcademicHistoryDto
@@ -123,10 +118,7 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
                 ProgramName = firstCourse.ProgramName
             };
 
-            var groupedByPeriod = allCourses
-                .GroupBy(c => c.Period)
-                .OrderBy(g => g.Key); // Order trimesters chronologically
-
+            var groupedByPeriod = allCourses.GroupBy(c => c.Period).OrderBy(g => g.Key);
             decimal cumulativeHonorPoints = 0;
             int cumulativeCredits = 0;
 
@@ -134,56 +126,38 @@ namespace SistemaAcademico.AcademicProgress.Core.Services
             {
                 decimal trimesterHonorPoints = 0;
                 int trimesterCredits = 0;
-
                 var courseHistoryDtos = new List<CourseHistoryDto>();
 
                 foreach (var course in periodGroup)
                 {
-                    string letterGrade;
-                    if (course.Status == "Retirado")
+                    string letterGrade = course.Status switch
                     {
-                        letterGrade = "R";
-                    }
-                    else if (course.Status == "Cursando")
-                    {
-                        letterGrade = "IP"; // "In Progress"
-                    }
-                    else if (course.FinalGrade.HasValue)
-                    {
-                        letterGrade = ConvertToLetterGrade(course.FinalGrade.Value);
-                    }
-                    else
-                    {
-                        letterGrade = "N/A"; // Fallback for unexpected cases
-                    }
+                        HistorialEstatus.Retirado => "R",
+                        HistorialEstatus.Cursando => "IP",
+                        _ when course.FinalGrade.HasValue => ConvertToLetterGrade((int)course.FinalGrade.Value),
+                        _ => "N/A"
+                    };
 
                     courseHistoryDtos.Add(new CourseHistoryDto
                     {
+                        CourseCode = course.CourseCode, // Map the CourseCode here
                         CourseName = course.CourseName,
                         Credits = course.Credits,
                         LetterGrade = letterGrade
                     });
 
-                    // Only include non-withdrawn, graded courses in index calculations
-                    if (course.Status != "Retirado" && course.Status != "Cursando" && course.FinalGrade.HasValue)
+                    if (course.Status == HistorialEstatus.Aprobado || course.Status == HistorialEstatus.Reprobado)
                     {
-                        var honorPoints = ConvertToHonorPoints(course.FinalGrade.Value);
+                        var honorPoints = ConvertToHonorPoints((int)course.FinalGrade!.Value);
                         trimesterHonorPoints += honorPoints * course.Credits;
                         trimesterCredits += course.Credits;
                     }
                 }
 
-                // Calculate trimester index
-                var trimesterIndex = (trimesterCredits > 0)
-                    ? Math.Round(trimesterHonorPoints / trimesterCredits, 2)
-                    : 0;
-
-                // Update and calculate cumulative index
+                var trimesterIndex = (trimesterCredits > 0) ? Math.Round(trimesterHonorPoints / trimesterCredits, 2) : 0;
                 cumulativeHonorPoints += trimesterHonorPoints;
                 cumulativeCredits += trimesterCredits;
-                var cumulativeIndex = (cumulativeCredits > 0)
-                    ? Math.Round(cumulativeHonorPoints / cumulativeCredits, 2)
-                    : 0;
+                var cumulativeIndex = (cumulativeCredits > 0) ? Math.Round(cumulativeHonorPoints / cumulativeCredits, 2) : 0;
 
                 historyReport.Trimesters.Add(new TrimesterHistoryDto
                 {

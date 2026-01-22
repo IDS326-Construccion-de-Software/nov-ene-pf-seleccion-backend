@@ -55,9 +55,9 @@ namespace SistemaAcademico.Persistence.Data
         Cursando,
         Aprobado,
         Reprobado,
-        Retirado
+        Retirado,
         Convalidado,
-        Exonerado
+        Exonerado,
         Seleccionado,
         Preseleccionado
     }

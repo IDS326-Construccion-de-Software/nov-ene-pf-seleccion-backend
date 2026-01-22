@@ -1,4 +1,6 @@
-﻿namespace SistemaAcademico.AcademicProgress.Core.Entities
+﻿using SistemaAcademico.Persistence.Data;
+
+namespace SistemaAcademico.AcademicProgress.Core.Entities
 {
     /// <summary>
     /// Representa una proyección de datos con la información detallada de una asignatura cursada.
@@ -9,8 +11,9 @@
         public string CourseCode { get; set; } = string.Empty;
         public string CourseName { get; set; } = string.Empty;
         public int Credits { get; set; }
-        public decimal? FinalGrade { get; set; }
+        public int? FinalGrade { get; set; }
+        public int? MidtermGrade { get; set; }
         public string StudentName { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty; // Added Status property
+        public HistorialEstatus Status { get; set; }
     }
 }
