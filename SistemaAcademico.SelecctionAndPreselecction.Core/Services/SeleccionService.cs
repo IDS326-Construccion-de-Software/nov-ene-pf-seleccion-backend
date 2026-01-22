@@ -87,8 +87,8 @@ public class SeleccionService : ISeleccionService
                                 Motivo = "Choque de horario",
                                 DetalleAsignatura = existente.IdSeccionNavigation.IdAsignaturaNavigation.Nombre,
                                 Dia = existente.Dia.ToString(),
-                                HoraInicio = existente.HoraInicio.ToString(@"hh\:mm"),
-                                HoraFin = existente.HoraFin.ToString(@"hh\:mm")
+                                HoraInicio = existente.HoraInicio.ToString(@"HH\:mm"),
+                                HoraFin = existente.HoraFin.ToString(@"HH\:mm")
                             };
                         }
                     }
@@ -257,7 +257,7 @@ public class SeleccionService : ISeleccionService
                 PeriodoTrimestre = apa.Periodo,
                 PuedeSeleccionar = puedeSeleccionar,
                 MotivoBloqueo = motivoBloqueo,
-                Procesada = preseleccionesProcesadas.Any(p => p.IdSeccionNavigation.IdAsignatura == apa.IdAsignatura),
+                Definitiva = preseleccionesProcesadas.Any(p => p.IdSeccionNavigation.IdAsignatura == apa.IdAsignatura),
                 TotalSeccionesAsignatura = seccionesDto.Count,
                 Secciones = seccionesDto
             };
@@ -370,6 +370,18 @@ public class SeleccionService : ISeleccionService
             return new AccionSeleccionResponseDto { Success = false, Message = $"No puedes exceder el límite de {resumenActual.CreditosMaximos} créditos." };
         }
 
+        // Eliminar preselección procesada de la misma asignatura si existe
+        var preselecciones = await _preseleccionRepository.GetByUsuarioAndPeriodoAsync(usuarioId, activePeriod.Id);
+        var preseleccionProcesada = preselecciones.FirstOrDefault(p =>
+            p.Procesada &&
+            p.Activa &&
+            p.IdSeccionNavigation.IdAsignatura == seccion.IdAsignatura);
+
+        if (preseleccionProcesada != null)
+        {
+            await _preseleccionRepository.DeleteAsync(preseleccionProcesada);
+        }
+
         var seleccion = new Seleccion
         {
             IdUsuario = usuarioId,
@@ -440,8 +452,8 @@ public class SeleccionService : ISeleccionService
                 Horarios = s.IdSeccionNavigation.SeccionHorarios.Select(h => new HorarioSeleccionResumenDto
                 {
                     Dia = h.Dia.ToString(),
-                    HoraInicio = h.HoraInicio.ToString(@"hh\:mm"),
-                    HoraFin = h.HoraFin.ToString(@"hh\:mm"),
+                    HoraInicio = h.HoraInicio.ToString(@"HH\:mm"),
+                    HoraFin = h.HoraFin.ToString(@"HH\:mm"),
                     Aula = h.IdAulaNavigation?.Nombre ?? "N/A",
                     Edificio = h.IdAulaNavigation?.IdEdificioNavigation?.Nombre ?? "N/A"
                 }).ToList()
@@ -488,8 +500,8 @@ public class SeleccionService : ISeleccionService
                 Horarios = p.IdSeccionNavigation.SeccionHorarios.Select(h => new HorarioSeleccionResumenDto
                 {
                     Dia = h.Dia.ToString(),
-                    HoraInicio = h.HoraInicio.ToString(@"hh\:mm"),
-                    HoraFin = h.HoraFin.ToString(@"hh\:mm"),
+                    HoraInicio = h.HoraInicio.ToString(@"HH\:mm"),
+                    HoraFin = h.HoraFin.ToString(@"HH\:mm"),
                     Aula = h.IdAulaNavigation?.Nombre ?? "N/A",
                     Edificio = h.IdAulaNavigation?.IdEdificioNavigation?.Nombre ?? "N/A"
                 }).ToList()

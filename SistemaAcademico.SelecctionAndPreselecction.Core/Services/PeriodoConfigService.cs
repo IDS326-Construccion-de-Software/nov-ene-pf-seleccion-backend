@@ -11,10 +11,14 @@ namespace SistemaAcademico.SelecctionAndPreselecction.Core.Services;
 public class PeriodoConfigService : IPeriodoConfigService
 {
     private readonly IPeriodoConfigRepository _periodoConfigRepository;
+    private readonly IPreseleccionRepository _preseleccionRepository;
 
-    public PeriodoConfigService(IPeriodoConfigRepository periodoConfigRepository)
+    public PeriodoConfigService(
+        IPeriodoConfigRepository periodoConfigRepository,
+        IPreseleccionRepository preseleccionRepository)
     {
         _periodoConfigRepository = periodoConfigRepository;
+        _preseleccionRepository = preseleccionRepository;
     }
 
     public async Task<IEnumerable<PeriodoConfigDto>> GetAllAsync()
@@ -82,6 +86,8 @@ public class PeriodoConfigService : IPeriodoConfigService
 
         if (now >= period.SeleccionInicio && now <= period.SeleccionFin)
         {
+            // Cuando inicia la fase de selección, eliminar preselecciones no procesadas
+            await CleanUnprocessedPreselections(period.Id);
             return PeriodoFase.Seleccion;
         }
 
@@ -91,6 +97,18 @@ public class PeriodoConfigService : IPeriodoConfigService
         }
 
         return PeriodoFase.Cerrado;
+    }
+
+    private async Task CleanUnprocessedPreselections(int periodoId)
+    {
+        try
+        {
+            await _preseleccionRepository.DeleteUnprocessedPreselectionsByPeriodAsync(periodoId);
+        }
+        catch
+        {
+            // Silenciar errores para no afectar el flujo principal
+        }
     }
 
     public async Task<bool> CanModifyAsync()
