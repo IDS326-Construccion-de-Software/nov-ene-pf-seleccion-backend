@@ -1,4 +1,6 @@
-﻿namespace SistemaAcademico.AcademicProgress.Core.Entities
+﻿using SistemaAcademico.Persistence.Data;
+
+namespace SistemaAcademico.AcademicProgress.Core.Entities
 {
     /// <summary>
     /// Proyección de datos para el historial académico. No es una entidad de BD.
@@ -9,9 +11,10 @@
         public string StudentName { get; set; } = string.Empty;
         public string ProgramName { get; set; } = string.Empty;
         public string Period { get; set; } = string.Empty;
+        public string CourseCode { get; set; } = string.Empty;
         public string CourseName { get; set; } = string.Empty;
         public int Credits { get; set; }
         public int? FinalGrade { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public HistorialEstatus Status { get; set; }
     }
 }

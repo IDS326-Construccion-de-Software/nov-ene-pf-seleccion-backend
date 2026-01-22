@@ -1,6 +1,7 @@
 ﻿using SistemaAcademico.AcademicProgress.Core.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SistemaAcademico.Persistence.Data;
 
 namespace SistemaAcademico.AcademicProgress.Core.Interfaces
 {
@@ -23,7 +24,7 @@ namespace SistemaAcademico.AcademicProgress.Core.Interfaces
         /// <param name="period">El período académico en formato "YYYY-Q#".</param>
         /// <param name="states">La lista de estados de la selección a incluir (ej. "Aprobando", "Cursando").</param>
         /// <returns>Una lista de objetos con la información detallada de las calificaciones.</returns>
-        Task<IEnumerable<CourseDetailInfo>> GetGradesByPeriodAsync(int studentId, string period, IEnumerable<string> states);
+        Task<IEnumerable<CourseDetailInfo>> GetGradesByPeriodAsync(int studentId, string period, IEnumerable<HistorialEstatus> states);
 
         /// <summary>
         /// Obtiene toda la información de los cursos completados por un estudiante.
