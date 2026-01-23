@@ -15,6 +15,5 @@ namespace SistemaAcademico.Retirement.Core.DTOs
         public string PeriodoAcademico { get; set; } = null!;
 
         public string Asignatura { get; set; } = null!;
-        public string Comentario { get; set; } = null!;
     }
 }
