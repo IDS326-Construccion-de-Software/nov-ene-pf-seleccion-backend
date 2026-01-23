@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SistemaAcademico.Authentication.Core.Interfaces;
 using SistemaAcademico.Persistence.Models;
@@ -19,18 +20,20 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
         private readonly IMemoryCache _cache;
         private readonly int _maxAttempts;
         private readonly int _lockoutMinutes;
+        private readonly ILogger<MemoryLoginThrottlingService> _logger;
 
-        public MemoryLoginThrottlingService(IMemoryCache cache, IConfiguration configuration)
+        public MemoryLoginThrottlingService(IMemoryCache cache, IConfiguration configuration, ILogger<MemoryLoginThrottlingService> logger)
         {
             _cache = cache;
+            _logger = logger;
 
-            // Leemos la configuración. Si no existe, usamos valores por defecto seguros (5 intentos, 15 min)
+            // Leemos la configuración. Si no existe, usamos valores por defecto seguros (5 intentos, 7 min)
             var section = configuration.GetSection("LoginThrottling");
             string? maxAttemptsVal = section["MaxFailedAttempts"];
             string? lockoutMinVal = section["LockoutMinutes"];
 
             _maxAttempts = int.TryParse(maxAttemptsVal, out int m) ? m : 5;
-            _lockoutMinutes = int.TryParse(lockoutMinVal, out int l) ? l : 15;
+            _lockoutMinutes = int.TryParse(lockoutMinVal, out int l) ? l : 7;
         }
 
         public Task<bool> EstaBloqueadoAsync(string key)
@@ -54,11 +57,33 @@ namespace SistemaAcademico.Authentication.Infrastructure.Services
             intentos++;
             _cache.Set(attemptsKey, intentos);
 
-            // Si superó el límite, creamos la llave de BLOQUEO
             if (intentos >= _maxAttempts)
             {
                 // El bloqueo expira automáticamente después del tiempo configurado
                 _cache.Set($"BLOCK_{key}", true, TimeSpan.FromMinutes(_lockoutMinutes));
+
+                var cleanInput = key.Replace('\n', '_').Replace('\r', '_');
+                if (cleanInput.Length > 100) cleanInput = cleanInput.Substring(0, 100);
+
+                // Enmascaramiento para proteger PII (CWE-532)
+                // usuario@dominio.com -> us***@dominio.com
+                string maskedEmail = cleanInput;
+                int atIndex = cleanInput.IndexOf('@');
+
+                if (atIndex > 2)
+                {
+                    maskedEmail = string.Concat(cleanInput.AsSpan(0, 2), "***", cleanInput.AsSpan(atIndex));
+                }
+                else if (atIndex > 0)
+                {
+                    maskedEmail = string.Concat(cleanInput.AsSpan(0, 1), "***", cleanInput.AsSpan(atIndex));
+                }
+
+                // Log con datos enmascarados
+                _logger.LogWarning(
+                    "SEGURIDAD: Intento de fuerza bruta detectado. Usuario {MaskedEmail} ha sido BLOQUEADO por {Minutes} minutos.",
+                    maskedEmail, _lockoutMinutes
+                );
             }
 
             return Task.CompletedTask;
