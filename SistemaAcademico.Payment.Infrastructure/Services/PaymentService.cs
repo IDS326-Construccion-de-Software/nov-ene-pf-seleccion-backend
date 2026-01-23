@@ -13,7 +13,7 @@ namespace SistemaAcademico.Payment.Infrastructure.Services
         private readonly IPaymentGatewayService _paymentGatewayService;
 
         public PaymentService(
-            ICuentaPorPagarRepository cuentaPorPagarRepository, 
+            ICuentaPorPagarRepository cuentaPorPagarRepository,
             IFacturaRepository facturaRepository,
             IPaymentGatewayService paymentGatewayService)
         {
@@ -49,12 +49,12 @@ namespace SistemaAcademico.Payment.Infrastructure.Services
 
             // Validate data
             if (!_paymentGatewayService.ValidatePaymentData(gatewayRequest))
-                 return new PaymentResultDTO { Success = false, Message = "Datos de tarjeta inválidos o expirados." };
+                return new PaymentResultDTO { Success = false, Message = "Datos de tarjeta inválidos o expirados." };
 
             // Generate Hash (Conceptually sending to gateway)
-            string hash = _paymentGatewayService.GeneratePaymentHash(gatewayRequest);
+            _paymentGatewayService.GeneratePaymentHash(gatewayRequest);
             // In a real app, we would send 'hash' + data to the external API here.
-            
+
             // 3. Update internal state
             // Calculate new remaining
             cuenta.CantidadRestante -= request.Amount;
@@ -76,7 +76,7 @@ namespace SistemaAcademico.Payment.Infrastructure.Services
                 MontoTotal = request.Amount,
                 IdCuentaPorPagar = cuenta.Id
             };
-            
+
             // Add detail
             factura.DetalleFacturas.Add(new DetalleFactura
             {
@@ -91,9 +91,9 @@ namespace SistemaAcademico.Payment.Infrastructure.Services
             await _facturaRepository.Create(factura);
             await _cuentaPorPagarRepository.Update(cuenta);
 
-            return new PaymentResultDTO 
-            { 
-                Success = true, 
+            return new PaymentResultDTO
+            {
+                Success = true,
                 Message = "Pago realizado correctamente.",
                 FacturaId = factura.IdFactura
             };
