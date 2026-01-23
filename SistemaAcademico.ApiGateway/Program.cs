@@ -14,6 +14,9 @@ using SistemaAcademico.Authentication.Infrastructure;
 using SistemaAcademico.SelecctionAndPreselecction.Core.Interfaces;
 using SistemaAcademico.SelecctionAndPreselecction.Core.Services;
 using SistemaAcademico.SelecctionAndPreselecction.Infrastructure.Persistence.Repositories;
+using SistemaAcademico.Professor.Core.Interfaces;
+using SistemaAcademico.Professor.Core.Services;
+using SistemaAcademico.Professor.Infrastructure.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +50,8 @@ builder.Services.AddScoped<ISectionRepository, SectionRepository>();
 builder.Services.AddScoped<IPeriodoConfigRepository, PeriodoConfigRepository>();
 builder.Services.AddScoped<IPreseleccionRepository, PreseleccionRepository>();
 builder.Services.AddScoped<ISeleccionRepository, SeleccionRepository>();
+builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
+
 
 // AutoMappers
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -61,6 +66,7 @@ builder.Services.AddScoped<IAcademicProgressRepository, AcademicProgressReposito
 builder.Services.AddScoped<IPeriodoConfigService, PeriodoConfigService>();
 builder.Services.AddScoped<IPreseleccionService, PreseleccionService>();
 builder.Services.AddScoped<ISeleccionService, SeleccionService>();
+builder.Services.AddScoped<IProfessorService, ProfessorService>();
 
 
 

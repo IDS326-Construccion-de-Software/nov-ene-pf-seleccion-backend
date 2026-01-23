@@ -613,6 +613,8 @@ public partial class SistemaAcademicoContext : DbContext
             entity.Property(e => e.SeleccionFin).HasColumnName("SeleccionFin");
             entity.Property(e => e.RetiroInicio).HasColumnName("RetiroInicio");
             entity.Property(e => e.RetiroFin).HasColumnName("RetiroFin");
+            entity.Property(e => e.FechaLimitePublicacionMedioTermino).HasColumnName("FechaLimitePublicacionMedioTermino");
+            entity.Property(e => e.FechaLimitePublicacionFinal).HasColumnName("FechaLimitePublicacionFinal");
             entity.Property(e => e.PermitirModificarEnSeleccion).HasColumnName("PermitirModificarEnSeleccion");
         });
 
