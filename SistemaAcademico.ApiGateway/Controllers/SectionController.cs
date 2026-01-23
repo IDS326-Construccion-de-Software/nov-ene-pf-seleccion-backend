@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SistemaAcademico.AcademicCatalog.Core.DTOs.Section;
 using SistemaAcademico.AcademicCatalog.Core.Interfaces;
@@ -20,7 +19,6 @@ namespace SistemaAcademico.ApiGateway.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetSections([FromQuery] string? subjectId)
         {
             var sections = _sectionRepository.GetSections(subjectId);

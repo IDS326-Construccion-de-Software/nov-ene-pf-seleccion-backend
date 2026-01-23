@@ -1,17 +1,16 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SistemaAcademico.ApiGateway.Constants;
+using SistemaAcademico.Persistence.Data;
 using SistemaAcademico.SelecctionAndPreselecction.Core.DTOs.Preseleccion;
 using SistemaAcademico.SelecctionAndPreselecction.Core.Interfaces;
-using SistemaAcademico.Persistence.Data;
-using SistemaAcademico.ApiGateway.Constants;
-using System.Collections.Generic;
-using System;
 using System.Threading.Tasks;
 
 namespace SistemaAcademico.ApiGateway.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "estudiante")]
     public class PreselectionController : ControllerBase
     {
         private readonly IPreseleccionService _preseleccionService;
@@ -32,19 +31,23 @@ namespace SistemaAcademico.ApiGateway.Controllers
             [FromQuery] int page = PaginationParams.page,
             [FromQuery] int itemsPerPage = PaginationParams.itemsPerPage)
         {
-            var response = await _preseleccionService.GetOfertaAsync(usuarioId, searchTerm, tipoAsignatura, soloDisponibles, modalidad, periodo, page, itemsPerPage);
+            var response = await _preseleccionService.GetOfertaAsync(
+                usuarioId, searchTerm, tipoAsignatura,
+                soloDisponibles, modalidad, periodo, page, itemsPerPage);
+
             if (response.TotalItems > 0 && page > response.TotalPages)
-            {
                 return NotFound("No hay más páginas disponibles");
-            }
 
             return Ok(response);
         }
 
         [HttpPost("guardar")]
-        public async Task<ActionResult<AccionPreseleccionResponseDto>> Guardar([FromBody] GuardarPreseleccionRequest request)
+        public async Task<ActionResult<AccionPreseleccionResponseDto>> Guardar(
+            [FromBody] GuardarPreseleccionRequest request)
         {
-            var result = await _preseleccionService.GuardarPreseleccionAsync(request.UsuarioId, request.SeccionId);
+            var result = await _preseleccionService
+                .GuardarPreseleccionAsync(request.UsuarioId, request.SeccionId);
+
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
@@ -52,8 +55,7 @@ namespace SistemaAcademico.ApiGateway.Controllers
         [HttpGet("resumen/{usuarioId}")]
         public async Task<ActionResult<ResumenPreseleccionResponseDto>> GetResumen(int usuarioId)
         {
-            var response = await _preseleccionService.GetResumenAsync(usuarioId);
-            return Ok(response);
+            return Ok(await _preseleccionService.GetResumenAsync(usuarioId));
         }
 
         [HttpDelete("cancelar/{id}/{usuarioId}")]
@@ -64,13 +66,6 @@ namespace SistemaAcademico.ApiGateway.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Finaliza la preselección del estudiante marcando todas las asignaturas activas como procesadas.
-        /// Esto indica que las asignaturas preseleccionadas están listas para ser confirmadas en la fase de Selección.
-        /// Solo disponible durante la fase de Preselección.
-        /// </summary>
-        /// <param name="usuarioId">ID del estudiante.</param>
-        /// <returns>Resultado de la operación indicando la cantidad de asignaturas procesadas.</returns>
         [HttpPost("finalizar/{usuarioId}")]
         public async Task<ActionResult<AccionPreseleccionResponseDto>> FinalizarPreseleccion(int usuarioId)
         {
@@ -78,8 +73,6 @@ namespace SistemaAcademico.ApiGateway.Controllers
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
-
-
     }
 
     public class GuardarPreseleccionRequest

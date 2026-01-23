@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaAcademico.Persistence.Models;
 using SistemaAcademico.Retirement.Core.DTOs;
-using SistemaAcademico.Retirement.Core.Interfaces;
 using SistemaAcademico.Retirement.Core.Services;
 
 namespace SistemaAcademico.ApiGateway.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "estudiante")]
     public class RetirementController : ControllerBase
     {
         private readonly SistemaAcademicoContext _context;
@@ -17,6 +17,7 @@ namespace SistemaAcademico.ApiGateway.Controllers
         {
             _context = context;
         }
+
         [HttpPut]
         public async Task<string> Retirar([FromBody] SeleccionRetirementDTO slrDTO)
         {
