@@ -24,6 +24,10 @@ public partial class PeriodoConfig
 
     public DateTime RetiroFin { get; set; }
 
+    public DateTime FechaLimitePublicacionMedioTermino { get; set; }
+
+    public DateTime FechaLimitePublicacionFinal { get; set; }
+
     public bool PermitirModificarEnSeleccion { get; set; } = true;
 
     public virtual ICollection<Preseleccion> Preseleccions { get; set; } = new List<Preseleccion>();

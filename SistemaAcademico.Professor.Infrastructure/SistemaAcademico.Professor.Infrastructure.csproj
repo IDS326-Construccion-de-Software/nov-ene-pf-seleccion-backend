@@ -19,6 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\SistemaAcademico.Infraestrucutre\SistemaAcademico.SharedKernel.Infrastructure.csproj" />
     <ProjectReference Include="..\SistemaAcademico.Professor.Core\SistemaAcademico.Professor.Core.csproj" />
+
+	  <ProjectReference Include="..\SistemaAcademico.Persistence\SistemaAcademico.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
