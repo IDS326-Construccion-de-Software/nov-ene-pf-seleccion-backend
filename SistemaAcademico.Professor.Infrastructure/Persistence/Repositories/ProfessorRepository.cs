@@ -76,7 +76,7 @@ public class ProfessorRepository : IProfessorRepository
             from h in hJoin.DefaultIfEmpty()
 
             where sel.IdSeccion == sectionId
-                  && sel.Activa == true
+                  && sel.Activa
             select new SectionStudentDto
             {
                 StudentId = u.IdUsuario,
@@ -124,7 +124,7 @@ public class ProfessorRepository : IProfessorRepository
 
         // Selecciones reales (para validar pertenencia de estudiantes + obtener IdPeriodo de cada matrícula)
         var selectionsInSection = await _db.Seleccions
-            .Where(s => s.IdSeccion == sectionId && s.Activa == true)
+            .Where(s => s.IdSeccion == sectionId && s.Activa)
             .ToListAsync();
 
         if (selectionsInSection.Count == 0)
@@ -213,7 +213,7 @@ public class ProfessorRepository : IProfessorRepository
             throw new InvalidOperationException("La fecha límite para publicar calificaciones de medio término ya expiró.");
 
         var selectionsInSection = await _db.Seleccions
-            .Where(s => s.IdSeccion == sectionId && s.Activa == true)
+            .Where(s => s.IdSeccion == sectionId && s.Activa)
             .ToListAsync();
 
         if (selectionsInSection.Count == 0)
