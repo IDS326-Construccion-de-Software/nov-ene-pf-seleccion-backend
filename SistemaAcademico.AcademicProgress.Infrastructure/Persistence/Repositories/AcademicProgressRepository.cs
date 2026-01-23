@@ -105,5 +105,89 @@ namespace SistemaAcademico.AcademicProgress.Infrastructure.Persistence.Repositor
                       })
                 .ToListAsync();
         }
+
+        /// <inheritdoc />
+        public async Task<int> GetTotalAsignaturasCursadasAsync(int usuarioId)
+        {
+            return await _dbContext.HistorialAcademicos
+                .Where(h => h.IdUsuario == usuarioId && h.Estatus == HistorialEstatus.Aprobado)
+                .Select(h => h.IdAsignatura)
+                .Distinct()
+                .CountAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<int> GetTotalAsignaturasPendientesAsync(int usuarioId)
+        {
+            // Obtener el programa académico activo del usuario
+            var studentProgram = await _dbContext.UsuarioProgramaAcademicos
+                .FirstOrDefaultAsync(upa => upa.IdUsuario == usuarioId && upa.Estatus == "Activo");
+
+            if (studentProgram == null) return 0;
+
+            // Obtener las asignaturas aprobadas del usuario
+            var asignaturasAprobadas = await _dbContext.HistorialAcademicos
+                .Where(h => h.IdUsuario == usuarioId && h.Estatus == HistorialEstatus.Aprobado)
+                .Select(h => h.IdAsignatura)
+                .Distinct()
+                .ToListAsync();
+
+            // Obtener el total de asignaturas del programa académico
+            var totalAsignaturasPensum = await _dbContext.AsignaturaProgramaAcademicos
+                .Where(apa => apa.IdProgramaAcademico == studentProgram.IdProgramaAcademico)
+                .CountAsync();
+
+            // Calcular las asignaturas pendientes
+            return totalAsignaturasPensum - asignaturasAprobadas.Count;
+        }
+
+        /// <inheritdoc />
+        public async Task<int?> GetTrimestreActualAsync(int usuarioId)
+        {
+            var usuarioPrograma = await _dbContext.UsuarioProgramaAcademicos
+                .Include(up => up.IdUsuarioNavigation)
+                    .ThenInclude(u => u.UsuarioRols)
+                .FirstOrDefaultAsync(up => up.IdUsuario == usuarioId && up.Estatus == "Activo");
+
+            if (usuarioPrograma == null)
+                return null;
+
+            // Verificar si el usuario tiene rol de estudiante (RolId = 2)
+            var esEstudiante = usuarioPrograma.IdUsuarioNavigation.UsuarioRols
+                .Any(ur => ur.IdRol == 2 && ur.Estatus == "Activo");
+
+            if (!esEstudiante)
+                return null;
+
+            return usuarioPrograma.TrimestreActual;
+        }
+
+        /// <inheritdoc />
+        public async Task<int?> GetPermanenciaEstudianteAsync(int usuarioId)
+        {
+            var usuarioPrograma = await _dbContext.UsuarioProgramaAcademicos
+                .Include(up => up.IdUsuarioNavigation)
+                    .ThenInclude(u => u.UsuarioRols)
+                .FirstOrDefaultAsync(up => up.IdUsuario == usuarioId && up.Estatus == "Activo");
+
+            if (usuarioPrograma == null)
+                return null;
+
+            // Verificar si el usuario tiene rol de estudiante (RolId = 2)
+            var esEstudiante = usuarioPrograma.IdUsuarioNavigation.UsuarioRols
+                .Any(ur => ur.IdRol == 2 && ur.Estatus == "Activo");
+
+            if (!esEstudiante)
+                return null;
+
+            return usuarioPrograma.Permanencia;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> IsEstudianteAsync(int usuarioId)
+        {
+            return await _dbContext.UsuarioRols
+                .AnyAsync(ur => ur.IdUsuario == usuarioId && ur.IdRol == 2 && ur.Estatus == "Activo");
+        }
     }
 }

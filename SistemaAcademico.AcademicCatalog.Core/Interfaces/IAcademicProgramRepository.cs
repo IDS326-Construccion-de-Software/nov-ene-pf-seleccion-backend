@@ -9,6 +9,7 @@ public interface IAcademicProgramRepository
     ProgramaAcademico? GetAcadmicProgramById(int academicProgramId);
     bool AcademicProgramExist(int academicProgramId);
     bool AcademicProgramNameExist(int academicProgramName);
+    int GetTotalSubjectsByAcademicProgram(int academicProgramId);
 
     /*
     - GetAcademicsProgramsByCareer

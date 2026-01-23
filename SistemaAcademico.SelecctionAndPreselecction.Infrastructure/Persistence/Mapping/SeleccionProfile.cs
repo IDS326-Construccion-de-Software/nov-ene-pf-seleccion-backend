@@ -22,8 +22,8 @@ public class SeleccionProfile : Profile
 
         CreateMap<SeccionHorario, HorarioOfertaSeleccionDto>()
             .ForMember(dest => dest.Dia, opt => opt.MapFrom(src => src.Dia.ToString()))
-            .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.HoraInicio.ToString(@"hh\:mm")))
-            .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.HoraFin.ToString(@"hh\:mm")))
+            .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.HoraInicio.ToString(@"HH\:mm")))
+            .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.HoraFin.ToString(@"HH\:mm")))
             .ForMember(dest => dest.Aula, opt => opt.MapFrom(src => src.IdAulaNavigation.Nombre))
             .ForMember(dest => dest.Edificio, opt => opt.MapFrom(src => 
                 src.IdAulaNavigation != null && src.IdAulaNavigation.IdEdificioNavigation != null

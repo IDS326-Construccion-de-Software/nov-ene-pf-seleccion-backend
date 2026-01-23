@@ -32,5 +32,40 @@ namespace SistemaAcademico.AcademicProgress.Core.Interfaces
         /// <param name="studentId">El ID del estudiante.</param>
         /// <returns>Una lista de objetos con la información del historial.</returns>
         Task<IEnumerable<StudentCourseHistoryInfo>> GetAllCompletedCoursesForStudentAsync(int studentId);
+
+        /// <summary>
+        /// Obtiene el total de asignaturas cursadas con estado Aprobado para un usuario.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario.</param>
+        /// <returns>El total de asignaturas aprobadas.</returns>
+        Task<int> GetTotalAsignaturasCursadasAsync(int usuarioId);
+
+        /// <summary>
+        /// Obtiene el total de asignaturas pendientes por tomar en el programa académico del usuario.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario.</param>
+        /// <returns>El total de asignaturas pendientes.</returns>
+        Task<int> GetTotalAsignaturasPendientesAsync(int usuarioId);
+
+        /// <summary>
+        /// Obtiene el trimestre actual de un estudiante.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario.</param>
+        /// <returns>El trimestre actual o null si no es estudiante o no existe.</returns>
+        Task<int?> GetTrimestreActualAsync(int usuarioId);
+
+        /// <summary>
+        /// Obtiene la permanencia de un estudiante.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario.</param>
+        /// <returns>La permanencia o null si no es estudiante o no existe.</returns>
+        Task<int?> GetPermanenciaEstudianteAsync(int usuarioId);
+
+        /// <summary>
+        /// Verifica si un usuario tiene el rol de Estudiante (RolId = 2).
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario.</param>
+        /// <returns>True si es estudiante, false en caso contrario.</returns>
+        Task<bool> IsEstudianteAsync(int usuarioId);
     }
 }

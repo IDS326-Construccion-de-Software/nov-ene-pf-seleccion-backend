@@ -37,4 +37,11 @@ public class AcademicProgramRepository : IAcademicProgramRepository
     {
         throw new NotImplementedException();
     }
+
+    public int GetTotalSubjectsByAcademicProgram(int academicProgramId)
+    {
+        return _db.AsignaturaProgramaAcademicos
+            .Where(apa => apa.IdProgramaAcademico == academicProgramId)
+            .Count();
+    }
 }

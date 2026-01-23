@@ -242,6 +242,21 @@ public static class IdentityAccessUsersData
             ClaveHash = PasswordHash,
             CambioClaveSolicitado = false,
             IdRol = 1
+        },
+        new Usuario
+        {
+            IdUsuario = 1077561,
+            Nombre = "Admin",
+            Apellido = "Administrador",
+            Nacionalidad = "Dominicana",
+            Direccion = "Av. Central",
+            Telefono = "8293724391",
+            CorreoPersonal = "admin04@gmail.com",
+            CorreoInstitucional = "admin@institucional.edu.do",
+            FechaIngreso = new DateTime(2020, 1, 8),
+            ClaveHash = PasswordHash,
+            CambioClaveSolicitado = false,
+            IdRol = 3
         }
     };
 
@@ -335,6 +350,12 @@ public static class IdentityAccessUsersData
         {
             IdUsuario = 1077560,
             IdRol = 1, // Laura es Profesor
+            Estatus = EstatusUsuario.Activo.ToString()
+        },
+        new UsuarioRol
+        {
+            IdUsuario = 1077561,
+            IdRol = 3, // Admin es Administrador
             Estatus = EstatusUsuario.Activo.ToString()
         }
     };

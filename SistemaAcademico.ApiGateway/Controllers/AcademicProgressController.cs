@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SistemaAcademico.AcademicProgress.Core.Interfaces;
+using SistemaAcademico.AcademicProgress.Core.DTOs;
 using System;
 using System.Threading.Tasks;
 
@@ -10,10 +11,14 @@ namespace SistemaAcademico.ApiGateway.Controllers
     public class AcademicProgressController : ControllerBase
     {
         private readonly IAcademicProgressService _academicProgressService;
+        private readonly IAcademicProgressRepository _academicProgressRepository;
 
-        public AcademicProgressController(IAcademicProgressService academicProgressService)
+        public AcademicProgressController(
+            IAcademicProgressService academicProgressService,
+            IAcademicProgressRepository academicProgressRepository)
         {
             _academicProgressService = academicProgressService;
+            _academicProgressRepository = academicProgressRepository;
         }
 
         /// <summary>
@@ -115,6 +120,156 @@ namespace SistemaAcademico.ApiGateway.Controllers
                 return Ok(result);
             }
             catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el total de asignaturas cursadas con estado Aprobado para un usuario.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario (query param).</param>
+        /// <returns>El total de asignaturas aprobadas.</returns>
+        [HttpGet("~/api/academic-progress/asignaturas-cursadas")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTotalAsignaturasCursadas([FromQuery] int usuarioId)
+        {
+            try
+            {
+                // Verificar si el usuario es estudiante
+                var esEstudiante = await _academicProgressRepository.IsEstudianteAsync(usuarioId);
+                if (!esEstudiante)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "Solo los estudiantes pueden consultar esta información.");
+                }
+
+                var total = await _academicProgressRepository.GetTotalAsignaturasCursadasAsync(usuarioId);
+
+                var response = new TotalAsignaturasCursadasDto
+                {
+                    TotalAsignaturasCursadas = total
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el total de asignaturas pendientes por tomar en el programa académico del usuario.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario (query param).</param>
+        /// <returns>El total de asignaturas pendientes.</returns>
+        [HttpGet("~/api/academic-progress/asignaturas-pendientes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTotalAsignaturasPendientes([FromQuery] int usuarioId)
+        {
+            try
+            {
+                // Verificar si el usuario es estudiante
+                var esEstudiante = await _academicProgressRepository.IsEstudianteAsync(usuarioId);
+                if (!esEstudiante)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "Solo los estudiantes pueden consultar esta información.");
+                }
+
+                var total = await _academicProgressRepository.GetTotalAsignaturasPendientesAsync(usuarioId);
+
+                var response = new TotalAsignaturasPendientesDto
+                {
+                    TotalAsignaturasPendientes = total
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el trimestre actual de un estudiante.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario (query param).</param>
+        /// <returns>El trimestre actual del estudiante.</returns>
+        [HttpGet("~/api/academic-progress/trimestre-actual")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTrimestreActual([FromQuery] int usuarioId)
+        {
+            try
+            {
+                // Verificar si el usuario es estudiante
+                var esEstudiante = await _academicProgressRepository.IsEstudianteAsync(usuarioId);
+                if (!esEstudiante)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "Solo los estudiantes pueden consultar esta información.");
+                }
+
+                var trimestre = await _academicProgressRepository.GetTrimestreActualAsync(usuarioId);
+
+                if (trimestre == null)
+                {
+                    return NotFound($"No se encontró información del programa académico para el usuario {usuarioId}.");
+                }
+
+                var response = new TrimestreActualDto
+                {
+                    TrimestreActualEstudiante = trimestre.Value
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene la permanencia de un estudiante.
+        /// </summary>
+        /// <param name="usuarioId">El ID del usuario (query param).</param>
+        /// <returns>La permanencia del estudiante.</returns>
+        [HttpGet("~/api/academic-progress/permanencia")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetPermanencia([FromQuery] int usuarioId)
+        {
+            try
+            {
+                // Verificar si el usuario es estudiante
+                var esEstudiante = await _academicProgressRepository.IsEstudianteAsync(usuarioId);
+                if (!esEstudiante)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "Solo los estudiantes pueden consultar esta información.");
+                }
+
+                var permanencia = await _academicProgressRepository.GetPermanenciaEstudianteAsync(usuarioId);
+
+                if (permanencia == null)
+                {
+                    return NotFound($"No se encontró información del programa académico para el usuario {usuarioId}.");
+                }
+
+                var response = new PermanenciaEstudianteDto
+                {
+                    PermanenciaEstudiante = permanencia.Value
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
