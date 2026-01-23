@@ -13,7 +13,9 @@ public partial class HistorialAcademico
 
     public int IdPeriodo { get; set; }
 
-    public decimal Calificacion { get; set; }
+    public decimal? Calificacion { get; set; }
+
+    public decimal? CalificacionMediotermino { get; set; }
 
     public HistorialEstatus Estatus { get; set; }
 

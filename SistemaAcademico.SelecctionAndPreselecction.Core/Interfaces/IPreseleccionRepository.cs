@@ -18,4 +18,5 @@ public interface IPreseleccionRepository
     Task UpdateAsync(Preseleccion preseleccion);
     Task DeleteAsync(Preseleccion preseleccion);
     Task UpdateSeccionAsync(Seccion seccion);
+    Task DeleteUnprocessedPreselectionsByPeriodAsync(int periodoId);
 }

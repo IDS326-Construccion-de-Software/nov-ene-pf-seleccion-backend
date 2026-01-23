@@ -133,12 +133,12 @@ var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigi
 
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy("OnSightLensPolicy",
-      policy => policy.WithOrigins(allowedOrigins)
-                      .AllowAnyMethod()
-                      .AllowAnyHeader()
-                      .AllowCredentials()
-                      .SetIsOriginAllowedToAllowWildcardSubdomains());
+    options.AddPolicy("OnSightLensPolicy",
+        policy => policy.WithOrigins(allowedOrigins)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains());
 });
 
 builder.Services.AddControllers();

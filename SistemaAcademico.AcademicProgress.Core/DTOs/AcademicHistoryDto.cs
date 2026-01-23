@@ -29,6 +29,7 @@ namespace SistemaAcademico.AcademicProgress.Core.DTOs
     /// </summary>
     public class CourseHistoryDto
     {
+        public string CourseCode { get; set; } = string.Empty; // Added this property
         public string CourseName { get; set; } = string.Empty;
         public int Credits { get; set; }
         public string LetterGrade { get; set; } = string.Empty;

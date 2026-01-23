@@ -115,4 +115,27 @@ public class PreseleccionRepository : IPreseleccionRepository
         _db.Seccions.Update(seccion);
         await _db.SaveChangesAsync();
     }
+
+    public async Task DeleteUnprocessedPreselectionsByPeriodAsync(int periodoId)
+    {
+        var unprocessedPreselections = await _db.Preseleccions
+            .Include(p => p.IdSeccionNavigation)
+            .Where(p => p.IdPeriodo == periodoId && p.Activa && !p.Procesada)
+            .ToListAsync();
+
+        if (unprocessedPreselections.Any())
+        {
+            // Restaurar cupos de las secciones
+            foreach (var preseleccion in unprocessedPreselections)
+            {
+                if (preseleccion.IdSeccionNavigation != null)
+                {
+                    preseleccion.IdSeccionNavigation.CupoDisponible++;
+                }
+            }
+
+            _db.Preseleccions.RemoveRange(unprocessedPreselections);
+            await _db.SaveChangesAsync();
+        }
+    }
 }
