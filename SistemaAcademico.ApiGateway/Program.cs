@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using SistemaAcademico.Persistence.Data;
 using SistemaAcademico.Persistence.Models;
 using SistemaAcademico.AcademicCatalog.Core.Interfaces;
+using SistemaAcademico.AcademicCatalog.Core.Services;
 using SistemaAcademico.AcademicCatalog.Infrastructure.Persistence.Repositories;
 using SistemaAcademico.AcademicProgress.Core.Interfaces;
 using SistemaAcademico.AcademicProgress.Core.Services;
@@ -63,6 +64,8 @@ builder.Services.AddScoped<IPeriodoConfigRepository, PeriodoConfigRepository>();
 builder.Services.AddScoped<IPreseleccionRepository, PreseleccionRepository>();
 builder.Services.AddScoped<ISeleccionRepository, SeleccionRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
+builder.Services.AddScoped<IAcademicCatalogRepository, AcademicCatalogRepository>();
+builder.Services.AddScoped<IAcademicCatalogService, AcademicCatalogService>();
 
 
 // AutoMappers
