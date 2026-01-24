@@ -22,6 +22,11 @@ using SistemaAcademico.SelecctionAndPreselecction.Core.Services;
 using SistemaAcademico.Payment.Core.Interfaces;
 using SistemaAcademico.Payment.Infrastructure.Repositories;
 using SistemaAcademico.Payment.Infrastructure.Services;
+using SistemaAcademico.Modules.Support.Infrastructure.Persistence;
+using SistemaAcademico.Modules.Support.Core.Interfaces;
+using SistemaAcademico.Modules.Support.Infrastructure.Persistence.Repositories;
+using SistemaAcademico.Modules.Support.Core.Services;
+// -----------------------------------------
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,20 +45,18 @@ else
     serverVersion = ServerVersion.AutoDetect(connectionString);
 }
 
+// Contexto principal
 builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
 {
     options.UseMySql(connectionString, serverVersion);
 });
 
-// Data Seeding
-//builder.Services.AddDbContext<SistemaAcademicoContext>(options =>
-//  options.UseMySql(connectionString, serverVersion)
-//  .UseSeeding((context, _) =>
-//  {
-//    var appContext = (SistemaAcademicoContext)context;
-//    DataSeeder.SeedData(appContext);
-//  })
-//);
+// Support
+builder.Services.AddDbContext<SupportDbContext>(options =>
+{
+    options.UseMySql(connectionString, serverVersion);
+});
+// --------------------------------
 
 // Repositories
 builder.Services.AddScoped<IAcademicAreaRepository, AcademicAreaRepository>();
@@ -63,6 +66,9 @@ builder.Services.AddScoped<IPeriodoConfigRepository, PeriodoConfigRepository>();
 builder.Services.AddScoped<IPreseleccionRepository, PreseleccionRepository>();
 builder.Services.AddScoped<ISeleccionRepository, SeleccionRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
+
+// Repositorio de Soporte
+builder.Services.AddScoped<ISupportRepository, SupportRepository>();
 
 
 // AutoMappers
@@ -114,6 +120,8 @@ builder.Services.AddScoped<IFacturaRepository, FacturaRepository>();
 builder.Services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
+// Support Services
+builder.Services.AddScoped<ISupportService, SupportService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -144,7 +152,7 @@ builder.Services.AddScoped<IAcademicProgramRepository, AcademicProgramRepository
 
 // Configuración de CORS
 var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>()
-                     ?? new[] { "http://localhost:5173" };
+                      ?? new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
@@ -160,7 +168,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// Configuraci�n de Swagger
+//
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sistema Academico API", Version = "v1" });
