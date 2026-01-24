@@ -19,6 +19,9 @@ using SistemaAcademico.Professor.Core.Interfaces;
 using SistemaAcademico.Professor.Core.Services;
 using SistemaAcademico.Professor.Infrastructure.Persistence.Repositories;
 using SistemaAcademico.SelecctionAndPreselecction.Core.Services;
+using SistemaAcademico.Payment.Core.Interfaces;
+using SistemaAcademico.Payment.Infrastructure.Repositories;
+using SistemaAcademico.Payment.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -104,6 +107,12 @@ builder.Services.AddScoped<IPeriodoConfigService, PeriodoConfigService>();
 builder.Services.AddScoped<IPreseleccionService, PreseleccionService>();
 builder.Services.AddScoped<ISeleccionService, SeleccionService>();
 builder.Services.AddScoped<IProfessorService, ProfessorService>();
+
+// Register Payment Module Services
+builder.Services.AddScoped<ICuentaPorPagarRepository, CuentaPorPagarRepository>();
+builder.Services.AddScoped<IFacturaRepository, FacturaRepository>();
+builder.Services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
 
