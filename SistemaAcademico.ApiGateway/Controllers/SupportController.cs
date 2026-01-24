@@ -30,10 +30,15 @@ namespace SistemaAcademico.ApiGateway.Controllers
                 var ticketId = await _service.CreateTicketAsync(userId, request);
                 return Ok(new { message = "Success", ticketId = ticketId });
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
                 var error = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                return BadRequest($"Database Error: {error}");
+                return BadRequest(error);
+            }
+            catch (ArgumentException ex)
+            {
+                var error = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return BadRequest(error);
             }
         }
     }
