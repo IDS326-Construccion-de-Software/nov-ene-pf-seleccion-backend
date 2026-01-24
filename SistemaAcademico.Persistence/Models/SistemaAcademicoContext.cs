@@ -52,6 +52,9 @@ public partial class SistemaAcademicoContext : DbContext
 
     public virtual DbSet<Seleccion> Seleccions { get; set; }
 
+    public virtual DbSet<Soporte> Soportes { get; set; }
+
+
     public virtual DbSet<Tarifario> Tarifarios { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
@@ -427,6 +430,40 @@ public partial class SistemaAcademicoContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Seleccion_Periodo");
         });
+
+        modelBuilder.Entity<Soporte>(entity =>
+        {
+            entity.HasKey(e => e.IdSoporte).HasName("PRIMARY");
+
+            entity.ToTable("Soporte");
+
+            entity.Property(e => e.IdSoporte)
+                .HasColumnName("ID_Soporte");
+
+            entity.Property(e => e.IdAsignatura)
+                .HasMaxLength(255)
+                .HasColumnName("ID_Asignatura");
+
+            entity.Property(e => e.IdUsuario)
+                .HasColumnName("ID_Usuario");
+
+            entity.Property(e => e.MotivoSolicitud)
+                .HasColumnName("motivoSolicitud");
+
+       
+            entity.HasIndex(e => e.IdAsignatura, "FK_Soporte_Asignatura");
+
+            entity.HasOne(d => d.IdAsignaturaNavigation).WithMany(p => p.Soportes)
+                .HasForeignKey(d => d.IdAsignatura)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Soporte_Asignatura");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Soportes)
+             .HasForeignKey(d => d.IdUsuario)
+             .OnDelete(DeleteBehavior.ClientSetNull)
+             .HasConstraintName("FK_Soporte_Usuario");
+        });
+
 
         modelBuilder.Entity<Tarifario>(entity =>
         {
