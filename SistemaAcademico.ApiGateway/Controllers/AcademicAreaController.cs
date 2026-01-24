@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SistemaAcademico.AcademicCatalog.Core.DTOs.AreaAcademica;
+using SistemaAcademico.AcademicCatalog.Core.DTOs.Asignatura;
 using SistemaAcademico.AcademicCatalog.Core.Interfaces;
 using SistemaAcademico.Persistence.Models;
 
@@ -12,10 +13,12 @@ namespace SistemaAcademico.ApiGateway.Controllers
     {
         private readonly IAcademicAreaRepository _academicAreaRepository;
         private readonly IMapper _mapper;
-        public AcademicAreaController(IAcademicAreaRepository academicAreaRepository, IMapper mapper)
+        private readonly IAcademicCatalogService _academicCatalogService;
+        public AcademicAreaController(IAcademicAreaRepository academicAreaRepository, IMapper mapper, IAcademicCatalogService academicCatalogService)
         {
             _academicAreaRepository = academicAreaRepository;
             _mapper = mapper;
+            _academicCatalogService = academicCatalogService;
         }
 
         [HttpGet]
@@ -97,6 +100,15 @@ namespace SistemaAcademico.ApiGateway.Controllers
                 return BadRequest(ModelState);
             }
             return NoContent();
+        }
+
+        [HttpGet("pensums/{pensumId}/asignaturas")]
+        public async Task<IActionResult> GetAsignaturasPorPensum(int pensumId)
+        {
+            if (pensumId <= 0) return BadRequest("ID de pensum inválido.");
+
+            var asignaturas = await _academicCatalogService.GetAsignaturasByPensumIdAsync(pensumId);
+            return Ok(asignaturas);
         }
     }
 }
