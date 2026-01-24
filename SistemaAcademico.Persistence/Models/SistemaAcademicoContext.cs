@@ -458,7 +458,8 @@ public partial class SistemaAcademicoContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Soporte_Asignatura");
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Soportes)
+            entity.HasOne(d => d.IdUsuarioNavigation)
+             .WithMany(p => p.Soportes)
              .HasForeignKey(d => d.IdUsuario)
              .OnDelete(DeleteBehavior.ClientSetNull)
              .HasConstraintName("FK_Soporte_Usuario");

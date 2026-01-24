@@ -12,7 +12,7 @@ namespace SistemaAcademico.Persistence.Models
 
         public string IdAsignatura { get; set; } = null!;
 
-        public string IdUsuario { get; set; } = null!;
+        public int IdUsuario { get; set; } = null!;
 
         public int MotivoSolicitud { get; set; }
 
