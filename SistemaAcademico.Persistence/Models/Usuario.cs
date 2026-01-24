@@ -37,6 +37,8 @@ public partial class Usuario
 
     public virtual ICollection<Seleccion> Seleccions { get; set; } = new List<Seleccion>();
 
+    public virtual ICollection<Soporte> Soportes { get; set; } = new List<Soporte>();
+
     public virtual ICollection<Preseleccion> Preseleccions { get; set; } = new List<Preseleccion>();
 
     public virtual ICollection<UsuarioAreaAcademica> UsuarioAreaAcademicas { get; set; } = new List<UsuarioAreaAcademica>();
@@ -50,4 +52,6 @@ public partial class Usuario
     public virtual ICollection<UsuarioTarifario> UsuarioTarifarios { get; set; } = new List<UsuarioTarifario>();
 
     public virtual ICollection<HistorialAcademico> HistorialAcademicos { get; set; } = new List<HistorialAcademico>();
+
+
 }
